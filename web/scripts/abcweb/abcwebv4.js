@@ -13,7 +13,7 @@ var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_j
 (function () {
 var muziek, curmtr, curtmp, msc_svgs, msc_gs, msc_wz, offset, mediaFnm, abcSave, elmed, scoreFnm, timerId = -1;
 var ybplayer, yubchk = 0, pbrates = [], noprogress = 0, onYouTubeAPIContinue, opt_url = {}, sok = null, gFac;
-var dummyPlayer = new DummyPlayer (), TOFF = 0.01;
+var dummyPlayer = new DummyPlayer (), TOFF = 0.01; // è 0.01
 opt = {}; // global options
 onYouTubeIframeAPIReady = yubApiReady;
 
@@ -96,32 +96,40 @@ Wijzer.prototype.setline = function (line) {
     this.line = line;
     this.wijzer.prependTo (msc_gs [line]);  // insert cursor in target music line
     this.width = msc_svgs [line].width.baseVal.value;
-    var n = $('#notation'), ntop = n.scrollTop ();
+    var n = $('#notation'), ntop = n.scrollTop ();  // scrollTop() -> prende la posizione verticale della scroll bar 
     var ymx = ntop + n.height () - this.vmargin;    // bottom of notation area
     if (this.line_offsets [line + 1] > ymx || this.line_offsets [line] < ntop + this.vmargin) {
         n.scrollTop (this.line_offsets [line] - this.tmargin);
     }
 }
+
 Wijzer.prototype.sety = function (ymin, ymax) {    // set height, width and top y-coor of music cursor
     this.wijzer.attr ('y', ymin.toFixed (2));
     this.wijzer.attr ('width','2');
     this.wijzer.attr ('height', (30 + ymax - ymin).toFixed (2));
     this.shade.attr ('fill','blue');
 }
+
+// il problema è qui!!!!
 Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in music line
     var n = $('#notation'), nleft = n.scrollLeft ();
     var xmx = nleft + n.width () - this.hmargin; // right most side of notation area
     // se uso la linea che scorre come cursore
     if (opt.lncsr) {
-        this.wijzer.attr ('x', x.toFixed (2));
-        this.wijzer.attr ('width', '2');
+        //var test = (xmx-nleft)/16;
+        //this.wijzer.attr ('x', x.toFixed(2)); // prima
+        this.wijzer.attr ('x',parseFloat(x).toFixed(2) ); // dopo
+        //this.wijzer.attr ('x', x+test);
+        console.log("x"+x);
+        this.wijzer.attr ('width', '7'); // larghezza cursore
         this.shade.attr ('fill-opacity', this.noCursor ? '0.0' : '0.5');
         x = x / this.scale;                     // g-coors -> pixels for scroll test
+        console.log("scale: " + this.scale);
         if (x > xmx || x < nleft + this.hmargin) {
             n.scrollLeft (x - this.hmargin);
         }
     } 
-    // se uso il rettangolo per ogni battuta
+    // se uso il rettangolo per ogni battuta  
     else {
         this.wijzer.attr ('x', xleft.toFixed (2));
         this.wijzer.attr ('width', (xright - xleft).toFixed (2));
@@ -133,6 +141,7 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
         }
     }
 }
+
 Wijzer.prototype.time2x = function (t, rondaf) {
     if (noprogress) return; // stop cursor until offset synced
     this.cursorTime = t;
@@ -147,9 +156,9 @@ Wijzer.prototype.time2x = function (t, rondaf) {
     }
     while (tix > 0 && t < times [tix - 1]) tix -= 1;
     if (rondaf && times [tix] - t < 0.3) {      // and times [tix] - t >= 0, by while loop above
-        times [tix] = t - TOFF;                 // correct timing !!
+        times [tix] = t - TOFF;                 // correct timing !! TOFF = 0.01
         console.log ('tijdcor: ' + (t - TOFF) + ', maat: ' + tix);
-        if (tix < times.length - 1) tix += 1;   // t now in the next measure
+        if (tix < times.length - 1) tix += 1;  // t now in the next measure
     }
     if (opt.metro && tix != this.time_ix) metronome (tix, t);
     this.time_ix = tix;
@@ -161,13 +170,30 @@ Wijzer.prototype.time2x = function (t, rondaf) {
     var tleft, tright, xleft, xright, x, lastTime;
     var xs = this.xs [line];
     tleft = times [tix - 1]; tright = times [tix];
-    // approssimazione conteggio movimenti (metronomo)
-    xleft = xs [msre - 1] + 10; xright = xs [msre] + 10;  // x positions are from box outlines, add 10 to appox. real position
+    // approssimazione conteggio movimenti (metronomo); punto di partenza cursori
+    var appodx, apposx;
+    // cursore 'linea'
+    if(opt.lncsr){
+        // problema: 40 va bene per le battute iniziali di ogni riga, ma per le altre no!
+        appodx = 10; // spazio da destra -5
+        apposx = 10;// spazio da sinistra 10
+    }
+    // cursore 'rettangolo'
+    else{
+        appodx = 10;
+        apposx = 10;
+    }
+    
+    xleft = xs [msre - 1] + apposx; xright = xs [msre] + appodx;  // x positions are from box outlines, add 10 to appox. real position
     x = xleft + (xright - xleft) * (t  - tleft) / (tright - tleft);
     lastTime = this.times [this.times.length - 1];
     if (t <= 0 || t > lastTime) this.setx (0, 0, 0);   // hide cursor if t not within score
     else                        this.setx (x, xleft, xright);
+    /* new code */
+    
+    /* new code */
     if (opt.synbox) { this.showSyncInfo (); }
+    
 }
 Wijzer.prototype.drawTags = function () {
     for (var k in {atag:1, btag:1}) {
@@ -189,12 +215,14 @@ Wijzer.prototype.doLoopTag = function (x, line, t, ix, tix) {
             if (mark == 'loopStart') { x = xleft; t = tleft + TOFF; }
             else { x = xright; t = tright - TOFF; }
         }
+        
         lpRec [tag] = { x: x.toFixed (2), line: line };
         lpRec.loopBtn = next;
         lpRec [mark] = t;
         that.drawTags ();
     }
     var d1, d2, that = this;
+    
     switch (lpRec.loopBtn) {
     case 1: putTag ('atag', x, line, 2, 'loopStart', t, ix, tix); break;
     case 2: if (t > lpRec.loopStart) putTag ('btag', x, line, 3, 'loopEnd', t, ix, tix); break;
@@ -209,7 +237,7 @@ Wijzer.prototype.x2time = function (x, line) {
     var xs, ts, ix, xleft, xright, tleft, tright, t, tix;
     x = x * this.scale;
     xs = this.xs [line];
-    ix = 1;
+    ix = 1; // ix=1
     if (x < xs [0]) { keyDown ({'keyCode':80}); return; }       // position before first bar line
     while (ix < xs.length && xs [ix] < x) ix += 1;
     if (ix == xs.length) { keyDown ({'keyCode':80}); return; }  // position beyond last bar line
@@ -217,7 +245,13 @@ Wijzer.prototype.x2time = function (x, line) {
     if (!msretix [this.repcnt]) this.repcnt = 1;                // clicked outside repeat: reset repcnt
     tix = msretix [this.repcnt];                                // ix == bar number == 1..
     ts = this.times;
-    xleft = xs [ix - 1];  xright = xs [ix];
+    /*
+     * tleft: ? 
+     * tright: ?
+     * xleft: spazio da sinistra
+     * xright: spazio da destra
+     */
+    xleft = xs [ix - 1] + 2;  xright = xs [ix] +5; // aggiunto +10
     tleft = ts [tix - 1]; tright = ts [tix];
     t = tleft + (tright - tleft) * (x - xleft) / (xright - xleft);
     if (opt.lopctl) { this.doLoopTag (x, line, t, ix, tix);
@@ -299,7 +333,7 @@ Wijzer.prototype.setScale = function () {
     scale = m.length ? m.getItem (0).matrix.a : 1;  // scale: svg-coors -> vbx-coors
     this.scale = ((w_vbx / scale) / w_svg);         // pixels -> svg-coors
     divoff = $('#notation').position ();        // music area relative to offset parent
-    divscroll = $('#notation').scrollTop ();
+    divscroll = $('#notation').scrollTop ();    
     this.line_offsets = [];                     // [(top music line - top music area) for each line]
     for (var i = 0; i < msc_svgs.length; ++i) {
         x = $(msc_svgs [i]).position ();
@@ -326,6 +360,7 @@ function DummyPlayer () {
     this.klok = -1;
     this.step = 200;
     this.playing = 0;
+    // (min, max, inc) initPbRates 
     initPbRates (0.1, 4, 0.05);
 }
 DummyPlayer.prototype.pause = function () {
@@ -458,6 +493,7 @@ function readMediaYub () {
 }
 
 function initPbRates (min, max, inc) {
+    
     pbrates = [];
     for (var x = min; x <= max + 0.001; x += inc) { // 0.001 because error in javascript integers !!
         x = Math.round (x * 100) / 100;
@@ -538,6 +574,7 @@ function setPlayer (fnm, mediaSrc) {
         }
         $elmed.attr ('src', mediaSrc + (offset ? '#t=' + offset : ''));
         $elmed.on ('timeupdate', tick);     // tick updates music cursor
+        
         $elmed.on ('playing', function () {
             dummyPlayer.setKlok (null, 0);
             elmed.playbackRate = opt.speed;
@@ -575,12 +612,6 @@ function setNotationHeight () {
     var b = parseFloat ($('body').css ('height'));
     var e = chk ? parseFloat ($('#err').css ('height')) : 0;
     var x = 100 - (100 * (h + e) / b).toFixed ();
-    /*
-     * Dimensione spartito
-     * $("#notation").css("height", 500 + "px");
-       $("#notation").css("width", 50 + "%");
-     * 
-     */
     $('#notation').css ('height', x + '%');   // fill all space below media
     $('#vidyub').css ('width', (h * 0.95 * 1.6).toFixed ());   // youtube player needs width, aspect 1.6
     centerPlayer ();
@@ -842,6 +873,7 @@ function flattenTimes (times) {  // the number of measure per line may have chan
 
 function tick () {
     if (!elmed) return;
+    //offset = 10; // aggiunto da me
     var t = (yubchk ? elmed.getCurrentTime () : elmed.currentTime) - offset, tcur = t;
     if (t < 0) t = 0;
     if (opt.lopctl) {
@@ -852,13 +884,16 @@ function tick () {
     if (msc_wz) msc_wz.time2x (t);
 }
 
-function klik (evt) {       // mousedown on svg
+function klik (evt) {       // mousedown on svg; click sullo spartito
     evt.preventDefault ();
     evt.stopPropagation();
     var line = msc_svgs.get().indexOf (this);   // index of the clicked svg
     var x = evt.clientX;    // position click relative to page
     x -= $(this).position ().left;  // minus (position left edge if svg relative to page)
-    msc_wz.x2time (x, line);
+    /*
+     * prima era x,line; il '-10' mi serve per ottenere un click preciso nello spartito
+     */
+    msc_wz.x2time (x-10, line); 
 }
 
 function syncChk () {
@@ -912,7 +947,7 @@ function metronome (tix, t) {
     var num, tik, dt, tb;
     clearInterval (in_count_in); in_count_in = 0;
     function telaf () {
-        if (tik <= num) {
+        if (tik <= num) { // num = movimenti
             in_count_in = setTimeout (telaf, dt);
             msc_wz.tiktak.text (tik);
             tik += 1;
@@ -978,7 +1013,7 @@ function keyDown (e) {
         else if (opt.lopctl && !opt.spdctl) $('#spdctl').click ();
         else $('#spdctl, #lopctl').click ();
     }
-    
+  
     /* inibisco l'input da tastiera per le opzioni del menù
     var key = e.keyCode ? e.keyCode : e.which;
     var done = 1;

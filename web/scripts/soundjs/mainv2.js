@@ -2,21 +2,22 @@ function changeVolume(value) {
     createjs.Sound.setVolume(value);
 }
 ;
-
+// funz. inutile da cancellare
 function createCircle(){
-    console.log("creo il cerchio");
-    // "circle" may be any tag name
-    var shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    // Set any attributes as desired
-    shape.setAttribute("cx", 25);
-    shape.setAttribute("cy", 25);
-    shape.setAttribute("r", 20);
-    shape.css ({fill:'green', stroke:'green', 'text-anchor':'end', 'font-size':'xx-large'});
-    shape.attr ('id', 'circle');
-    shape.attr ('y', -4);
-    // Add to a parent node; document.documentElement should be the root svg element.
-    // Acquiring a parent element with document.getElementById() would be safest.
-    document.documentElement.appendChild(shape);
+    var svgns = "http://www.w3.org/2000/svg";
+
+    var rect = document.createElementNS(svgns, 'rect');
+    rect.setAttributeNS(null, 'x', '100');
+    rect.setAttributeNS(null, 'y', '200');
+    rect.setAttributeNS(null, 'height', '50');
+    rect.setAttributeNS(null, 'width', '50');
+    rect.setAttributeNS(null, 'fill', '#' + Math.round(0xffffff * Math.random()).toString(16));
+    document.getElementById('notation').appendChild(rect);
+    /*
+    var newSvg = document.getElementById('notation');
+    newSvg.outerHTML += '<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;z-index:10;margin:0;padding:0;top:0em;left:0.5em" onclick="go()" width="100" height="100"><circle cx="40" cy="40" r="40" stroke="red" stroke-width="4" fill="blue" /></svg>';
+    */
+   
 }
 
 window.onload = function () {
@@ -48,7 +49,7 @@ window.onload = function () {
                 case 71 :// kick = f,g (prova cassa due dita)
                     document.getElementById("kick").setAttribute("src", "img/kickon.png");
                     playSound.call(this, 'kick');
-                    createCircle();
+                    //this.createRect(x,xleft,xright);
                     
                     break;
                 case 67:
