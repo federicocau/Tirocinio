@@ -135,55 +135,13 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                 var noteGiuste = 0; // note giuste in una battura (per ora)
-                var delta = 0.14; // delta di approssimazione per la pressione dei tasti
-                var json = spartitoDrums();
+                var delta = 0.11; // delta di approssimazione per la pressione dei tasti
+                var json = spartitoTamburo();
                 switch (key) {
-                    case 70: // f,g
+                    case 70: // f,g cassa 
                     case 71:
                         //wij.createRect(x, xleft, xright); -> crea il segno
-                        // approssimazione della tempistica del click
-                        /*
-                        // battuta 2
-                        if( (elmed.currentTime >= json.notes[4].time - delta) && (elmed.currentTime <= json.notes[4].time + delta) ){
-                            console.log("right 1");
-                        }                            
-                        if( (elmed.currentTime >= json.notes[5].time - delta) && (elmed.currentTime <= json.notes[5].time + delta) ){
-                            console.log("right 2");
-                        }            
-                        if( (elmed.currentTime >= json.notes[6].time - delta) && (elmed.currentTime <= json.notes[6].time + delta) ){
-                            console.log("right 3");
-                        }   
-                        if( (elmed.currentTime >= json.notes[7].time - delta) && (elmed.currentTime <= json.notes[7].time + delta) ){
-                            console.log("right 4");
-                        }    
-                        
-                        // battuta 3
-                        if( (elmed.currentTime >= json.notes[8].time - delta) && (elmed.currentTime <= json.notes[8].time + delta) ){
-                            console.log("right 1");
-                        }                            
-                        if( (elmed.currentTime >= json.notes[9].time - delta) && (elmed.currentTime <= json.notes[9].time + delta) ){
-                            console.log("right 2");
-                        }            
-                        if( (elmed.currentTime >= json.notes[10].time - delta) && (elmed.currentTime <= json.notes[10].time + delta) ){
-                            console.log("right 3");
-                        }   
-                        if( (elmed.currentTime >= json.notes[11].time - delta) && (elmed.currentTime <= json.notes[11].time + delta) ){
-                            console.log("right 4");
-                        }
-                        if( (elmed.currentTime >= json.notes[12].time - delta) && (elmed.currentTime <= json.notes[12].time + delta) ){
-                            console.log("right 5");
-                        }                            
-                        if( (elmed.currentTime >= json.notes[13].time - delta) && (elmed.currentTime <= json.notes[13].time + delta) ){
-                            console.log("right 6");
-                        }            
-                        if( (elmed.currentTime >= json.notes[14].time - delta) && (elmed.currentTime <= json.notes[14].time + delta) ){
-                            console.log("right 7");
-                        }   
-                        */
-                       if( (elmed.currentTime >= json.notes[6].time - delta) && (elmed.currentTime <= json.notes[6].time + delta) ){
-                            console.log("right 5a");
-                        }
-                       
+                        // approssimazione della tempistica del click 
                         
                         break;
                    /* case 86: // v
@@ -192,36 +150,120 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
                         
                     case 67:
                     case 86:// snare = c,v (prova tamburo con due dita)
-                        if( (elmed.currentTime >= json.notes[3].time - delta) && (elmed.currentTime <= json.notes[3].time + delta) ){
-                            console.log("right 3b");
+					                        
+                        // battuta 2
+                        if ((elmed.currentTime >= json.notes[4].time - delta) && (elmed.currentTime <= json.notes[4].time + delta)) {
+                            console.log("right 1");
                         }
-                        if( (elmed.currentTime >= json.notes[9].time - delta) && (elmed.currentTime <= json.notes[9].time + delta) ){
-                            console.log("right 7a");
-                        }
-
-                        break;
-                    case 65: // hat = a
-                        if( (elmed.currentTime >= json.notes[2].time - delta) && (elmed.currentTime <= json.notes[2].time + delta) ){
+                        if ((elmed.currentTime >= json.notes[5].time - delta) && (elmed.currentTime <= json.notes[5].time + delta)) {
                             console.log("right 2");
                         }
-                        if( (elmed.currentTime >= json.notes[4].time - delta) && (elmed.currentTime <= json.notes[4].time + delta) ){
-                            console.log("right 3a");
+                        if ((elmed.currentTime >= json.notes[6].time - delta) && (elmed.currentTime <= json.notes[6].time + delta)) {
+                            console.log("right 3");
                         }
-                        if( (elmed.currentTime >= json.notes[5].time - delta) && (elmed.currentTime <= json.notes[5].time + delta) ){
+                        if ((elmed.currentTime >= json.notes[7].time - delta) && (elmed.currentTime <= json.notes[7].time + delta)) {
                             console.log("right 4");
                         }
-                        if( (elmed.currentTime >= json.notes[7].time - delta) && (elmed.currentTime <= json.notes[7].time + delta) ){
-                            console.log("right 5b");
+
+                        // battuta 3
+                        if ((elmed.currentTime >= json.notes[8].time - delta) && (elmed.currentTime <= json.notes[8].time + delta)) {
+                            console.log("right 1");
                         }
-                        if( (elmed.currentTime >= json.notes[8].time - delta) && (elmed.currentTime <= json.notes[8].time + delta) ){
+                        if ((elmed.currentTime >= json.notes[9].time - delta) && (elmed.currentTime <= json.notes[9].time + delta)) {
+                            console.log("right 2");
+                        }
+                        if ((elmed.currentTime >= json.notes[10].time - delta) && (elmed.currentTime <= json.notes[10].time + delta)) {
+                            console.log("right 3");
+                        }
+                        if ((elmed.currentTime >= json.notes[11].time - delta) && (elmed.currentTime <= json.notes[11].time + delta)) {
+                            console.log("right 4");
+                        }
+                        if ((elmed.currentTime >= json.notes[12].time - delta) && (elmed.currentTime <= json.notes[12].time + delta)) {
+                            console.log("right 5");
+                        }
+                        if ((elmed.currentTime >= json.notes[13].time - delta) && (elmed.currentTime <= json.notes[13].time + delta)) {
                             console.log("right 6");
                         }
-                        if( (elmed.currentTime >= json.notes[10].time - delta) && (elmed.currentTime <= json.notes[10].time + delta) ){
-                            console.log("right 7b");
+                        if ((elmed.currentTime >= json.notes[14].time - delta) && (elmed.currentTime <= json.notes[14].time + delta)) {
+                            console.log("right 7");
                         }
-                        if( (elmed.currentTime >= json.notes[11].time - delta) && (elmed.currentTime <= json.notes[11].time + delta) ){
+
+                        // battuta 4
+                        if ((elmed.currentTime >= json.notes[15].time - delta) && (elmed.currentTime <= json.notes[15].time + delta)) {
+                            console.log("right 1");
+                        }
+                        if ((elmed.currentTime >= json.notes[16].time - delta) && (elmed.currentTime <= json.notes[16].time + delta)) {
+                            console.log("right 2");
+                        }
+                        if ((elmed.currentTime >= json.notes[17].time - delta) && (elmed.currentTime <= json.notes[17].time + delta)) {
+                            console.log("right 3");
+                        }
+                        if ((elmed.currentTime >= json.notes[18].time - delta) && (elmed.currentTime <= json.notes[18].time + delta)) {
+                            console.log("right 4");
+                        }
+                        if ((elmed.currentTime >= json.notes[19].time - delta) && (elmed.currentTime <= json.notes[19].time + delta)) {
+                            console.log("right 5");
+                        }
+                        if ((elmed.currentTime >= json.notes[20].time - delta) && (elmed.currentTime <= json.notes[20].time + delta)) {
+                            console.log("right 6");
+                        }
+                        if ((elmed.currentTime >= json.notes[21].time - delta) && (elmed.currentTime <= json.notes[21].time + delta)) {
+                            console.log("right 7");
+                        }
+                        if ((elmed.currentTime >= json.notes[22].time - delta) && (elmed.currentTime <= json.notes[22].time + delta)) {
                             console.log("right 8");
                         }
+
+                        // battuta 5
+                        if ((elmed.currentTime >= json.notes[23].time - delta) && (elmed.currentTime <= json.notes[23].time + delta)) {
+                            console.log("right 1");
+                        }
+                        if ((elmed.currentTime >= json.notes[24].time - delta) && (elmed.currentTime <= json.notes[24].time + delta)) {
+                            console.log("right 2");
+                        }
+                        if ((elmed.currentTime >= json.notes[25].time - delta) && (elmed.currentTime <= json.notes[25].time + delta)) {
+                            console.log("right 3");
+                        }
+                        if ((elmed.currentTime >= json.notes[26].time - delta) && (elmed.currentTime <= json.notes[26].time + delta)) {
+                            console.log("right 4");
+                        }
+                        if ((elmed.currentTime >= json.notes[27].time - delta) && (elmed.currentTime <= json.notes[27].time + delta)) {
+                            console.log("right 5");
+                        }
+                        if ((elmed.currentTime >= json.notes[28].time - delta) && (elmed.currentTime <= json.notes[28].time + delta)) {
+                            console.log("right 6");
+                        }
+                        if ((elmed.currentTime >= json.notes[29].time - delta) && (elmed.currentTime <= json.notes[29].time + delta)) {
+                            console.log("right 7");
+                        }
+
+                        // battuta 6
+                        if ((elmed.currentTime >= json.notes[30].time - delta) && (elmed.currentTime <= json.notes[30].time + delta)) {
+                            console.log("right 1");
+                        }
+                        if ((elmed.currentTime >= json.notes[31].time - delta) && (elmed.currentTime <= json.notes[31].time + delta)) {
+                            console.log("right 2");
+                        }
+                        if ((elmed.currentTime >= json.notes[32].time - delta) && (elmed.currentTime <= json.notes[32].time + delta)) {
+                            console.log("right 3");
+                        }
+                        if ((elmed.currentTime >= json.notes[33].time - delta) && (elmed.currentTime <= json.notes[33].time + delta)) {
+                            console.log("right 4");
+                        }
+                        if ((elmed.currentTime >= json.notes[34].time - delta) && (elmed.currentTime <= json.notes[34].time + delta)) {
+                            console.log("right 5");
+                        }
+                        if ((elmed.currentTime >= json.notes[35].time - delta) && (elmed.currentTime <= json.notes[35].time + delta)) {
+                            console.log("right 6");
+                        }
+                        if ((elmed.currentTime >= json.notes[36].time - delta) && (elmed.currentTime <= json.notes[36].time + delta)) {
+                            console.log("right 7");
+                        }
+                        if ((elmed.currentTime >= json.notes[37].time - delta) && (elmed.currentTime <= json.notes[37].time + delta)) {
+                            console.log("right 8");
+                        }
+                        break;
+                    case 65: // hat = a
 
                         break;
                     case 90: // crash = z
