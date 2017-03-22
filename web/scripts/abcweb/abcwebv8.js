@@ -134,14 +134,104 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
             var wij = this; // prendo il widget
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
+                var noteGiuste = 0; // note giuste in una battura (per ora)
+                var delta = 0.14; // delta di approssimazione per la pressione dei tasti
+                var json = spartitoDrums();
                 switch (key) {
                     case 70: // f,g
                     case 71:
                         //wij.createRect(x, xleft, xright); -> crea il segno
-                        console.log("offset: " + offset);
+                        // approssimazione della tempistica del click
+                        /*
+                        // battuta 2
+                        if( (elmed.currentTime >= json.notes[4].time - delta) && (elmed.currentTime <= json.notes[4].time + delta) ){
+                            console.log("right 1");
+                        }                            
+                        if( (elmed.currentTime >= json.notes[5].time - delta) && (elmed.currentTime <= json.notes[5].time + delta) ){
+                            console.log("right 2");
+                        }            
+                        if( (elmed.currentTime >= json.notes[6].time - delta) && (elmed.currentTime <= json.notes[6].time + delta) ){
+                            console.log("right 3");
+                        }   
+                        if( (elmed.currentTime >= json.notes[7].time - delta) && (elmed.currentTime <= json.notes[7].time + delta) ){
+                            console.log("right 4");
+                        }    
+                        
+                        // battuta 3
+                        if( (elmed.currentTime >= json.notes[8].time - delta) && (elmed.currentTime <= json.notes[8].time + delta) ){
+                            console.log("right 1");
+                        }                            
+                        if( (elmed.currentTime >= json.notes[9].time - delta) && (elmed.currentTime <= json.notes[9].time + delta) ){
+                            console.log("right 2");
+                        }            
+                        if( (elmed.currentTime >= json.notes[10].time - delta) && (elmed.currentTime <= json.notes[10].time + delta) ){
+                            console.log("right 3");
+                        }   
+                        if( (elmed.currentTime >= json.notes[11].time - delta) && (elmed.currentTime <= json.notes[11].time + delta) ){
+                            console.log("right 4");
+                        }
+                        if( (elmed.currentTime >= json.notes[12].time - delta) && (elmed.currentTime <= json.notes[12].time + delta) ){
+                            console.log("right 5");
+                        }                            
+                        if( (elmed.currentTime >= json.notes[13].time - delta) && (elmed.currentTime <= json.notes[13].time + delta) ){
+                            console.log("right 6");
+                        }            
+                        if( (elmed.currentTime >= json.notes[14].time - delta) && (elmed.currentTime <= json.notes[14].time + delta) ){
+                            console.log("right 7");
+                        }   
+                        */
+                       if( (elmed.currentTime >= json.notes[6].time - delta) && (elmed.currentTime <= json.notes[6].time + delta) ){
+                            console.log("right 5a");
+                        }
+                       
+                        
                         break;
-                    case 86: // v
-                        $(".segno").remove(); // rimuove tutti gli ipotetici 'errori'
+                   /* case 86: // v
+                        //$(".segno").remove(); // rimuove tutti gli ipotetici 'errori'
+                        break;*/
+                        
+                    case 67:
+                    case 86:// snare = c,v (prova tamburo con due dita)
+                        if( (elmed.currentTime >= json.notes[3].time - delta) && (elmed.currentTime <= json.notes[3].time + delta) ){
+                            console.log("right 3b");
+                        }
+                        if( (elmed.currentTime >= json.notes[9].time - delta) && (elmed.currentTime <= json.notes[9].time + delta) ){
+                            console.log("right 7a");
+                        }
+
+                        break;
+                    case 65: // hat = a
+                        if( (elmed.currentTime >= json.notes[2].time - delta) && (elmed.currentTime <= json.notes[2].time + delta) ){
+                            console.log("right 2");
+                        }
+                        if( (elmed.currentTime >= json.notes[4].time - delta) && (elmed.currentTime <= json.notes[4].time + delta) ){
+                            console.log("right 3a");
+                        }
+                        if( (elmed.currentTime >= json.notes[5].time - delta) && (elmed.currentTime <= json.notes[5].time + delta) ){
+                            console.log("right 4");
+                        }
+                        if( (elmed.currentTime >= json.notes[7].time - delta) && (elmed.currentTime <= json.notes[7].time + delta) ){
+                            console.log("right 5b");
+                        }
+                        if( (elmed.currentTime >= json.notes[8].time - delta) && (elmed.currentTime <= json.notes[8].time + delta) ){
+                            console.log("right 6");
+                        }
+                        if( (elmed.currentTime >= json.notes[10].time - delta) && (elmed.currentTime <= json.notes[10].time + delta) ){
+                            console.log("right 7b");
+                        }
+                        if( (elmed.currentTime >= json.notes[11].time - delta) && (elmed.currentTime <= json.notes[11].time + delta) ){
+                            console.log("right 8");
+                        }
+
+                        break;
+                    case 90: // crash = z
+
+                        break;
+                    case 83: // hitom = s
+
+                        break;
+                    case 88: // floortom = x
+
                         break;
                 }
             };
@@ -461,6 +551,7 @@ function copyTiming (xs, abctxt) {
     }
     $('#impbox').prop ('checked', false);
     toggleScoreBtn ();
+    console.log(offset_js);
 }
 
 function readAbcOrXML (abctxt) {
