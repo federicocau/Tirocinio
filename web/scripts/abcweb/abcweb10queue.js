@@ -8,6 +8,8 @@
 
 //~ "use strict";
 var msc_VERSION = 40;
+var play = false; // variabile per gestire il controller
+var queue = [];
 
 
 var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_js, endtime_js, abc_arr, lpRec;
@@ -1459,9 +1461,27 @@ $(document).ready (function () {
     });
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
     
-    document.getElementById('aud').addEventListener('play', function(){
-        controller(); // il controller parte quando premo play (per ora)
-    });
+        document.getElementById('aud').addEventListener('play', function () {
+            //console.log("play");
+            document.onkeydown = function (e) {
+                var key = e.keyCode ? e.keyCode : e.which;
+                switch (key) {
+                    case 67:
+                    case 86: // c,v
+                        var data = [key, elmed.currentTime];
+                        queue.push(data);
+                        console.log("keyTime: "+ data[1]);
+                        break;
+                }
+            };
+            controller(); // il controller parte quando premo play (per ora)
+        });
+        /*
+        document.getElementById('aud').addEventListener('pause', function () {
+            console.log("pause");
+            play = false; // non funziona
+            controller(play); // il controller parte quando premo play (per ora)
+        });*/
 });
 })();
 

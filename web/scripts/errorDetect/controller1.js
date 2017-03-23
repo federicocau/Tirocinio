@@ -7,6 +7,7 @@
 var delta = 0.11; // delta di approssimazione per la pressione dei tasti
 var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
 var i = 0;
+//sheet.length(); // definire la lunghezza del vettore per poter fermarsi prima che vada fuori range
 
 var queue = [];/*
 queue.push(2);         // queue is now [2]
@@ -15,30 +16,35 @@ var i = queue.shift(); // queue is now [5]
 alert(i);              // displays 2
 */
 
-
-function productor(){
+/*
+function productor(currentTime){   
+    document.onkeydown = function (e) {
+        var key = e.keyCode ? e.keyCode : e.which;
+        switch(e){
+            case 67:
+            case 86: // c,v
+                var data = [e,currentTime];
+                queue.push(data);
+                console.log("coda:"+ data);
+            break;
+    }
+};
     
-  /*  document.onkeydown = function (e) {
-    var key = e.keyCode ? e.keyCode : e.which;
-        
-    };*/
-    
-    /*var k = ['ciao',Math.random()];  
+    var k = ['ciao',Math.random()];  
     queue.push(k);
     console.log("produttore: " + k[0] + " " + k[1]);
-    setTimeout(productor, 400);*/
-}
+    setTimeout(productor, 400);
+}*/
 
-function controller(flag){
+function controller(){
     //if(queue){
-    if(flag){
         console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);
       //  item = queue.shift();
       //  console.log("item: " + item);
         i++;
-        console.log("sheet.notes[i-1].duration: " + sheet.notes[i-1].duration);
+        //console.log("rightTime " + sheet.notes[i-1].duration); // intervallo per il risveglio del controller
         var sleep = sheet.notes[i-1].duration; // moltiplico per 1000 per renderlo in secondi
    // }
-    setTimeout(controller, sleep*1000); // aspetto una durata pari alla nota corrente - un delta
-    }
+        setTimeout(controller, sleep*1000); // aspetto una durata pari alla nota corrente - un delta
+   
 }
