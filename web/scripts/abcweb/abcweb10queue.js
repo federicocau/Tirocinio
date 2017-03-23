@@ -9,8 +9,9 @@
 //~ "use strict";
 var msc_VERSION = 40;
 
+
 var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_js, endtime_js, abc_arr, lpRec;
-(function () {
+(function() {
 var muziek, curmtr, curtmp, msc_svgs, msc_gs, msc_wz, offset, mediaFnm, abcSave, elmed, scoreFnm, timerId = -1;
 var ybplayer, yubchk = 0, pbrates = [], noprogress = 0, onYouTubeAPIContinue, opt_url = {}, sok = null, gFac;
 var dummyPlayer = new DummyPlayer (), TOFF = 0.01; // è 0.01
@@ -65,6 +66,7 @@ function Wijzer (xss, ymins, ymaxs, times, tixlb, lbtix, tixbts) {  // create th
     this.tiktak.attr ('y', -4);
     this.tiktak.css ({fill:'green', stroke:'green', 'text-anchor':'end', 'font-size':'xx-large'});
     this.wijzer.append (this.tiktak);
+    
     this.atag =  $(document.createElementNS ('http://www.w3.org/2000/svg','text'));
     this.atag.attr ('id', 'atag'); this.atag.text ('<');
     this.atag.css ({fill:'red', stroke:'red', 'text-anchor':'middle'});
@@ -117,14 +119,26 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
     // se uso la linea che scorre come cursore
     if (opt.lncsr) {
         //var test = (xmx-nleft)/16;
-        //this.wijzer.attr ('x', x.toFixed(2)); // prima
-        this.wijzer.attr ('x',parseFloat(x).toFixed(2) ); // dopo
+        this.wijzer.attr ('x', x.toFixed(2) ); // dopo
         //this.wijzer.attr ('x', x+test);
-        console.log("x"+x);
-        this.wijzer.attr ('width', '7'); // larghezza cursore
+        x = x.toFixed(2); // altrimenti toFixed() non funge
+        this.wijzer.attr ('width', '22'); // larghezza cursore
+        // ho assegnato this.scale a scale per fare il toFixed ()
+        var scale = this.scale;
+        scale = (scale).toFixed(2); // riadatto anche scale
         this.shade.attr ('fill-opacity', this.noCursor ? '0.0' : '0.5');
-        x = x / this.scale;                     // g-coors -> pixels for scroll test
-        console.log("scale: " + this.scale);
+        /*
+         * x = x / scale: se voglio spostamenti vicini metto una scale piccola, altrimenti grande
+        */
+        x = x / scale;                     // g-coors -> pixels for scroll test;
+        x = x.toFixed(2); // altrimenti toFixed() non funge
+            var wij = this; // prendo il widget
+            document.onkeydown = function (e) {
+                var key = e.keyCode ? e.keyCode : e.which;
+                      
+            };
+
+        //console.log(" wijx: " + x + " line: " + this.line);
         if (x > xmx || x < nleft + this.hmargin) {
             n.scrollLeft (x - this.hmargin);
         }
@@ -142,6 +156,24 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
     }
 }
 
+/*** myfunc rect ***/
+Wijzer.prototype.createRect = function (x, xleft, xright){
+        this.segno = $(document.createElementNS('http://www.w3.org/2000/svg', 'text'));
+        this.segno.attr('class', 'segno');
+        this.segno.text('x'); // simbolo
+        this.segno.css({fill: 'red', stroke: 'red', 'text-anchor': 'right'}); // css achor right
+        this.segno.attr('x', x); // posizione asse x
+        ymin = this.ymin [this.line];
+        ymax = this.ymax [this.line];
+        this.segno.attr ('y', ymin.toFixed (2));
+        this.segno.attr ('width','2');
+        this.segno.attr ('height', (30 + ymax - ymin).toFixed (2));
+        
+        this.segno.prependTo (msc_gs [this.line]); // disegna nello spartito, ma dato che la synchro è in ritardo il segno risulta prima
+        //console.log("segnox: " + x + " line: " + this.line);
+};
+/*** funzione  ***/
+
 Wijzer.prototype.time2x = function (t, rondaf) {
     if (noprogress) return; // stop cursor until offset synced
     this.cursorTime = t;
@@ -155,12 +187,15 @@ Wijzer.prototype.time2x = function (t, rondaf) {
         return;
     }
     while (tix > 0 && t < times [tix - 1]) tix -= 1;
+    /* è utile????
     if (rondaf && times [tix] - t < 0.3) {      // and times [tix] - t >= 0, by while loop above
         times [tix] = t - TOFF;                 // correct timing !! TOFF = 0.01
         console.log ('tijdcor: ' + (t - TOFF) + ', maat: ' + tix);
-        if (tix < times.length - 1) tix += 1;  // t now in the next measure
-    }
-    if (opt.metro && tix != this.time_ix) metronome (tix, t);
+        if (tix < times.length - 1) tix += 1;  // t now in the next measure   
+    }*/
+    
+    
+    if (opt.metro && tix != this.time_ix) metronome (tix, t); // -> fa comparire il conteggio dei movimenti
     this.time_ix = tix;
     this.repcnt = this.tixlb [tix][2];
     msre = this.tixlb [tix][1], this.msre = msre;
@@ -170,13 +205,21 @@ Wijzer.prototype.time2x = function (t, rondaf) {
     var tleft, tright, xleft, xright, x, lastTime;
     var xs = this.xs [line];
     tleft = times [tix - 1]; tright = times [tix];
-    // approssimazione conteggio movimenti (metronomo); punto di partenza cursori
+    // approssimazione conteggio movimenti (cursore); punto di partenza cursori
     var appodx, apposx;
     // cursore 'linea'
     if(opt.lncsr){
         // problema: 40 va bene per le battute iniziali di ogni riga, ma per le altre no!
-        appodx = 10; // spazio da destra -5
-        apposx = 10;// spazio da sinistra 10
+        if(this.line == 0 && this.msre == 1){ // se siamo nella prima riga
+          appodx = 10; // spazio da destra -5
+          apposx = 10;// spazio da sinistra 10
+
+        }
+        else{
+          appodx = 10; // spazio da destra -5
+          apposx = 10;// spazio da sinistra 10  
+        }
+                  
     }
     // cursore 'rettangolo'
     else{
@@ -189,9 +232,6 @@ Wijzer.prototype.time2x = function (t, rondaf) {
     lastTime = this.times [this.times.length - 1];
     if (t <= 0 || t > lastTime) this.setx (0, 0, 0);   // hide cursor if t not within score
     else                        this.setx (x, xleft, xright);
-    /* new code */
-    
-    /* new code */
     if (opt.synbox) { this.showSyncInfo (); }
     
 }
@@ -204,6 +244,7 @@ Wijzer.prototype.drawTags = function () {
         this [k].attr ('y', this.ymin [a.line]);
     }
 }
+// funzione per il loop (non mi serve per ora)
 Wijzer.prototype.doLoopTag = function (x, line, t, ix, tix) {
     function putTag (tag, x, line, next, mark, t, ix, tix) {
         if (!opt.lncsr) {   // round click position to start or end of measure
@@ -233,6 +274,7 @@ Wijzer.prototype.doLoopTag = function (x, line, t, ix, tix) {
         else         putTag ('btag', x, line, 3, 'loopEnd', t, ix, tix);
     }
 }
+            
 Wijzer.prototype.x2time = function (x, line) {
     var xs, ts, ix, xleft, xright, tleft, tright, t, tix;
     x = x * this.scale;
@@ -281,6 +323,7 @@ Wijzer.prototype.changeTimesKeyb  = function (gfac) {
     var mnum = this.lbtix [this.line] [this.msre][this.repcnt] - 1; // the cursor is in measure mnum = tix - 1 = 0..
     this.changeTimes (mnum, gfac, 0);
 }
+// è utile?
 Wijzer.prototype.changeTimes = function (mnum, dt, dur) {   // endtime += dt or endtime = begintime + dur
     var tix, tendnew, ts = this.times;
     for (tix = mnum + 1; tix < ts.length; ++ tix) {
@@ -410,6 +453,7 @@ function copyTiming (xs, abctxt) {
     }
     $('#impbox').prop ('checked', false);
     toggleScoreBtn ();
+    console.log(offset_js);
 }
 
 function readAbcOrXML (abctxt) {
@@ -893,7 +937,7 @@ function klik (evt) {       // mousedown on svg; click sullo spartito
     /*
      * prima era x,line; il '-10' mi serve per ottenere un click preciso nello spartito
      */
-    msc_wz.x2time (x-10, line); 
+    msc_wz.x2time (x-12, line); 
 }
 
 function syncChk () {
@@ -948,14 +992,15 @@ function metronome (tix, t) {
     clearInterval (in_count_in); in_count_in = 0;
     function telaf () {
         if (tik <= num) { // num = movimenti
-            in_count_in = setTimeout (telaf, dt);
+            in_count_in = setTimeout (telaf, dt);// -> monitora il timing per il conteggio dei movimenti
             msc_wz.tiktak.text (tik);
             tik += 1;
+            //console.log("tik: " + tik + " in_count_in: " + in_count_in);
         }
     }
-    num = msc_wz.tixbts [tix - 1]; tik = 1;
-    dt =  (msc_wz.times [tix] - t) / num / opt.speed * 1000;
-    in_count_in = setTimeout (telaf, 0);
+    num = msc_wz.tixbts [tix - 1]; tik = 1; // al cambio di battuta il movimento è = 1
+    dt =  (msc_wz.times [tix] - t) / num / opt.speed * 1000; // 1000
+    in_count_in = setTimeout (telaf, 0); // era telaf,0
 }
 function clear_metronome () {
     if (!msc_wz) return;
@@ -974,7 +1019,7 @@ function do_count_in (cmd, delay) {
     cmd = cmd.replace (':true', ':false');  // reset count_in request
     var ci = msc_wz.compCountIn ();         // -> ci.time, ci.num
     telaf ();
-    in_count_in = setInterval (telaf, ci.time * 1000);
+    in_count_in = setInterval (telaf, ci.time * 1000); // * 1000
 }
 
 function playPause (cmd, delay) {  // cmd = do_pause : at_time
@@ -1016,7 +1061,7 @@ function keyDown (e) {
   
     /* inibisco l'input da tastiera per le opzioni del menù
     var key = e.keyCode ? e.keyCode : e.which;
-    var done = 1;
+    /*var done = 1;
     switch (key) {
     case 219: case 88: msc_wz.goMsre (0); break;    // [, x
     case 221: case 67: msc_wz.goMsre (1); break;    // ], c
@@ -1413,5 +1458,10 @@ $(document).ready (function () {
         e.dataTransfer.dropEffect = 'copy';         // show a plus sign to indicate the file is copied
     });
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
+    
+    document.getElementById('aud').addEventListener('play', function(){
+        controller(); // il controller parte quando premo play (per ora)
+    });
 });
 })();
+

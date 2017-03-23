@@ -9,6 +9,7 @@
 //~ "use strict";
 var msc_VERSION = 40;
 
+
 var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_js, endtime_js, abc_arr, lpRec;
 (function() {
 var muziek, curmtr, curtmp, msc_svgs, msc_gs, msc_wz, offset, mediaFnm, abcSave, elmed, scoreFnm, timerId = -1;
@@ -41,6 +42,8 @@ function initGlobals () {
     offset = 0.0;       // offset: time in media file where music starts
     gFac = 0.1;         // absolute change for offset or duration
     noprogress = 0;     // stop cursor until offset synced
+    //productor();
+    //controller();       // nuovo codice
 }
 // creazione cursore
 function Wijzer (xss, ymins, ymaxs, times, tixlb, lbtix, tixbts) {  // create the music cursor
@@ -134,16 +137,7 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
             var wij = this; // prendo il widget
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
-                switch (key) {
-                    case 70: // f,g
-                    case 71:
-                        //wij.createRect(x, xleft, xright); -> crea il segno
-                        console.log("offset: " + offset);
-                        break;
-                    case 86: // v
-                        $(".segno").remove(); // rimuove tutti gli ipotetici 'errori'
-                        break;
-                }
+                      
             };
 
         //console.log(" wijx: " + x + " line: " + this.line);
@@ -461,6 +455,7 @@ function copyTiming (xs, abctxt) {
     }
     $('#impbox').prop ('checked', false);
     toggleScoreBtn ();
+    console.log(offset_js);
 }
 
 function readAbcOrXML (abctxt) {
@@ -1438,7 +1433,7 @@ $(document).ready (function () {
     vtxt += '<br>using:<br><a href="http://moinejf.free.fr/js/">abc2svg</a>, ©Jef Moine'
     $('#help').prepend ('<div style="position: absolute; right: 5px;">' + vtxt + '</div>');
     $('#helpm').click (function () { $('#help').toggleClass ('showhlp'); });
-    $('#meddiv').on ('mousedown touchstart', msc_shift);
+    $('#meddiv').on ('mousedown touchstart', msc_shift,controller());
     $('#fknp').change (function () { readLocalFile ('btn', []); });
     $('#mknp').change (function () { readMedia ('btn', []); });
     $('#yknp').click (readMediaYub);
