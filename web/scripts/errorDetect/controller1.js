@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 
+/* vedere come implementare la coda!!! */
+
 var delta = 0.11; // delta di approssimazione per la pressione dei tasti
 var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
 var i = 0;
@@ -36,6 +38,8 @@ function productor(currentTime){
     setTimeout(productor, 400);
 }*/
 
+
+/* funzionante: senza controllo sulla coda
 function controller(){
     //if(queue){
         console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);
@@ -47,4 +51,21 @@ function controller(){
    // }
         setTimeout(controller, sleep*1000); // aspetto una durata pari alla nota corrente - un delta
    
+}*/
+
+// test prelievo sulla coda -> inserirlo in abcweb10queue
+function controller(){
+    //if(queue){
+        console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);
+        var item = queue.shift();
+        console.log("item: " + item);
+        if( (item[1] >= sheet[i].time-delta) && (item[1] <= sheet[i].time+delta) )
+            console.log("right");
+        i++;
+        //console.log("rightTime " + sheet.notes[i-1].duration); // intervallo per il risveglio del controller
+        var sleep = sheet.notes[i-1].duration; // moltiplico per 1000 per renderlo in secondi
+   // }
+        setTimeout(controller, sleep*1000); // aspetto una durata pari alla nota corrente - un delta
+   
 }
+

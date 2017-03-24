@@ -9,7 +9,7 @@
 //~ "use strict";
 var msc_VERSION = 40;
 var play = false; // variabile per gestire il controller
-var queue = [];
+var queue = Queue();
 var delta = 0.15; // delta di approssimazione per la pressione dei tasti
 
 var i = 0;
@@ -1465,9 +1465,9 @@ $(document).ready (function () {
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
     
         var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
-        var item;
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
+            /*
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                 switch (key) {
@@ -1478,20 +1478,25 @@ $(document).ready (function () {
                         console.log("keyTime: "+ data[1] + " " + sheet.notes[i].name);
                         break;
                 }
-            };
+            };*/
             //controller(); // il controller parte quando premo play (per ora)
             
             
             controller();
             function controller() {
                 //if(queue){
-                console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);
-                
-                if(queue){
-                    item = queue.shift(); // null alla lettura
-                    console.log("item: " + item);
-                
-                
+                console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);   
+                if(!queue.isEmpty()){
+                    // genero un item per test
+                    var item = {name: 'asd', time: 0.2147124};
+                    
+                    // lo inserisco nella coda
+                    queue.insert(item);
+                    
+                    // lo estraggo dalla coda
+                    var item = queue.shift();
+                    
+                    console.log("item: " + item.name + " " + item.time); // non riesce ad accedere all'item
                     if ((item[1] >= sheet[i].time - delta) && (item[1] <= sheet[i].time + delta))
                         console.log("right");
                     i++;

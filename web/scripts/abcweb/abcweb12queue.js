@@ -9,8 +9,7 @@
 //~ "use strict";
 var msc_VERSION = 40;
 var play = false; // variabile per gestire il controller
-var queue = [];
-var delta = 0.15; // delta di approssimazione per la pressione dei tasti
+var delta = 0.4; // delta di approssimazione per la pressione dei tasti; best: 0.4
 
 var i = 0;
 
@@ -1463,43 +1462,64 @@ $(document).ready (function () {
         e.dataTransfer.dropEffect = 'copy';         // show a plus sign to indicate the file is copied
     });
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
-    
-        var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
-        var item;
+    // creo la coda
+    var queue = Queue();
+    var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
+            
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                 switch (key) {
                     case 67:
                     case 86: // c,v
-                        var data = [key, elmed.currentTime];
-                        queue.push(data);
-                        console.log("keyTime: "+ data[1] + " " + sheet.notes[i].name);
+                        var item = {name: key, time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
+                        queue.insert(item);
                         break;
                 }
             };
-            //controller(); // il controller parte quando premo play (per ora)
-            
-            
+          
             controller();
             function controller() {
-                //if(queue){
-                console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);
-                
-                if(queue){
-                    item = queue.shift(); // null alla lettura
-                    console.log("item: " + item);
-                
-                
-                    if ((item[1] >= sheet[i].time - delta) && (item[1] <= sheet[i].time + delta))
-                        console.log("right");
-                    i++;
+                // approssimo t a 3 cifre decimali                
+                rightTime = sheet.notes[i].time;
+                rightTime = rightTime.toFixed(3);
+                //console.log("current: " + elmed.currentTime + "note: " + rightTime);
+                //console.log("rightTime: " + rt.toFixed(3) );   
+                if(!queue.isEmpty()){ 
+                    // estraggo l'item dalla coda
+                    var item = queue.shift();
+                    
+                    // lo elimino dalla coda
+                    queue.delete();
+                    
+                    // fightTime + itemTime + differenza tra i due
+                    //console.log("rt: " + rightTime + " it: " + item.time + " dif: " + (rightTime - item.time) );
+                    //console.log(item.time+">="+(rightTime-delta)+"; "+item.time+"<="+(rightTime+delta));
+                    
+                    // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
+                    if ((item.time >= rightTime - delta) && (item.time <= rightTime + delta))
+                        console.log("right");    
+                    else
+                        console.log("wrong"); 
                 }
-                //console.log("rightTime " + sheet.notes[i-1].duration); // intervallo per il risveglio del controller
-                var sleep = sheet.notes[i - 1].duration; // moltiplico per 1000 per renderlo in secondi
-                // }
-                setTimeout(controller, sleep * 1000); // aspetto una durata pari alla nota corrente - un delta
+
+                // intervallo tra una nota e l'altra
+                var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
+                
+                // durata effettiva della nota
+                var duration = sheet.notes[i].duration;
+                
+                // se l'intervallo tra una nota e l'altra è uguale alla durata della nota
+                if ( (interval >= duration - 0.1) && (interval <= duration + 0.1) )
+                    sleep = duration;
+                else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
+                    sleep = sheet.notes[i + 1].time - sheet.notes[i].time; 
+                
+                // incremento l'indice del vettore delle note
+                i++;
+                console.log(i);
+                setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
             }
         });
         /*
