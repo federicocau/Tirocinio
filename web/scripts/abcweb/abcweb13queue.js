@@ -9,7 +9,7 @@
 //~ "use strict";
 var msc_VERSION = 40;
 var play = false; // variabile per gestire il controller
-var delta = 0.4; // delta di approssimazione per la pressione dei tasti; best: 0.4
+var delta = 0.5; // delta di approssimazione per la pressione dei tasti; best: 0.4/0.5
 
 var i = 0;
 
@@ -1495,7 +1495,7 @@ $(document).ready (function () {
                     
                     // fightTime + itemTime + differenza tra i due
                     //console.log("rt: " + rightTime + " it: " + item.time + " dif: " + (rightTime - item.time) );
-                    console.log(item.time+">="+(rightTime-delta)+"; "+item.time+"<="+(rightTime+delta));
+                    console.log(item.time+">="+((rightTime-delta).toFixed(2) )+"; "+item.time+"<="+( (rightTime-delta).toFixed(2) ) );
                     
                     // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
                     if ((item.time >= rightTime - delta) && (item.time <= rightTime + delta))
