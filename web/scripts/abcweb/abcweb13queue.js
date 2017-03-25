@@ -1533,9 +1533,9 @@ $(document).ready (function () {
         });
         
         document.getElementById('aud').addEventListener('pause', function () {
-            clearTimeout(count);
+            clearTimeout(count); // fermo le chiamate al controller
             console.log("clear");
-            i=0;
+            i=0; // azzero il contatore per il vettore delle note
         });
 });
 })();
