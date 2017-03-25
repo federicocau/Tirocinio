@@ -9,9 +9,8 @@
 //~ "use strict";
 var msc_VERSION = 40;
 var play = false; // variabile per gestire il controller
-var delta = 0.5; // delta di approssimazione per la pressione dei tasti; best: 0.4/0.5
+var delta = 0.7; // delta di approssimazione per la pressione dei tasti; best: 0.7
 
-var i = 0;
 
 
 var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_js, endtime_js, abc_arr, lpRec;
@@ -136,11 +135,11 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
         */
         x = x / scale;                     // g-coors -> pixels for scroll test;
         x = x.toFixed(2); // altrimenti toFixed() non funge
-            var wij = this; // prendo il widget
+            /*var wij = this; // prendo il widget
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                       
-            };
+            };*/
 
         //console.log(" wijx: " + x + " line: " + this.line);
         if (x > xmx || x < nleft + this.hmargin) {
@@ -1462,9 +1461,11 @@ $(document).ready (function () {
         e.dataTransfer.dropEffect = 'copy';         // show a plus sign to indicate the file is copied
     });
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
-    // creo la coda
-    var queue = Queue();
+    
+    var queue = Queue(); // creo la coda
     var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
+    var count; // variabile per il setTime
+    var i = 0; // indice del vettore
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
             
@@ -1493,41 +1494,49 @@ $(document).ready (function () {
                     // lo elimino dalla coda
                     queue.delete();
                     
-                    // fightTime + itemTime + differenza tra i due
+                    // rightTime + itemTime + differenza tra i due
                     //console.log("rt: " + rightTime + " it: " + item.time + " dif: " + (rightTime - item.time) );
-                    console.log(item.time+">="+((rightTime-delta).toFixed(2) )+"; "+item.time+"<="+( (rightTime-delta).toFixed(2) ) );
+                    var deltaSx = rightTime-delta;
+                    var deltaDx = rightTime+delta;
+                    console.log(item.time+">="+(deltaSx)+"; "+item.time+"<="+(deltaDx) );
                     
                     // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
                     if ((item.time >= rightTime - delta) && (item.time <= rightTime + delta))
                         console.log('%c right ', 'color: green'); 
-                    else
+                    else{
                         console.log('%c wrong ', 'color: red');
+                        //queue.delete();
+                    }
+                        
                 }
 
                 // intervallo tra una nota e l'altra
-                var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
-                
-                // durata effettiva della nota
-                var duration = sheet.notes[i].duration;
-                
-                // se l'intervallo tra una nota e l'altra è uguale alla durata della nota
-                if ( (interval >= duration - 0.1) && (interval <= duration + 0.1) )
-                    sleep = duration;
-                else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
-                    sleep = sheet.notes[i + 1].time - sheet.notes[i].time; 
-                
-                // incremento l'indice del vettore delle note
-                i++;
+                if(i < sheet.notes.length-1){          
+                    var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
+                    // durata effettiva della nota
+                    var duration = sheet.notes[i].duration;
+                    // se l'intervallo tra una nota e l'altra è uguale alla durata della nota
+                    if ( (interval >= duration - 0.1) && (interval <= duration + 0.1) )
+                        sleep = duration;
+                    else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
+                        sleep = sheet.notes[i + 1].time - sheet.notes[i].time; 
+                    // incremento l'indice del vettore delle note 
+                    i++;
+                }
+                else{
+                    
+                }
+                    
                 console.log(i);
-                setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
+                count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
             }
         });
-        /*
+        
         document.getElementById('aud').addEventListener('pause', function () {
-            console.log("pause");
-            play = false; // non funziona
-            controller(play); // il controller parte quando premo play (per ora)
-        });*/
+            clearTimeout(count);
+            console.log("clear");
+            i=0;
+        });
 });
 })();
 
