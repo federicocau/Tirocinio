@@ -1466,6 +1466,7 @@ $(document).ready (function () {
     var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
     var count; // variabile per il setTime
     var i = 0; // indice del vettore
+    var flag = false; // se suono prima o dopo rispetto all'esecuzione corretta dello spartito
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
             
@@ -1475,7 +1476,15 @@ $(document).ready (function () {
                     case 67:
                     case 86: // c,v
                         var item = {name: key, time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
-                        queue.insert(item);
+                        // se la coda non è vuota faccio pull and push
+                        if(!queue.isEmpty()){
+                            queue.delete();
+                            console.log('%c wrong ', 'color: red');
+                            queue.insert(item);
+                        }
+                        // altrimenti se è vuota faccio push
+                        else
+                            queue.insert(item);
                         break;
                 }
             };
@@ -1501,13 +1510,12 @@ $(document).ready (function () {
                     console.log(item.time+">="+(deltaSx)+"; "+item.time+"<="+(deltaDx) );
                     
                     // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
-                    if ((item.time >= rightTime - delta) && (item.time <= rightTime + delta))
+                    if ((item.time >= deltaSx) && (item.time <= deltaDx))
                         console.log('%c right ', 'color: green'); 
                     else{
                         console.log('%c wrong ', 'color: red');
                         //queue.delete();
-                    }
-                        
+                    }                       
                 }
 
                 // intervallo tra una nota e l'altra
@@ -1534,7 +1542,7 @@ $(document).ready (function () {
         
         document.getElementById('aud').addEventListener('pause', function () {
             clearTimeout(count); // fermo le chiamate al controller
-            console.log("clear");
+            console.log("Sheet end!");
             i=0; // azzero il contatore per il vettore delle note
         });
 });
