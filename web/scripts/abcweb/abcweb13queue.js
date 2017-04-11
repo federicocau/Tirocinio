@@ -1518,7 +1518,8 @@ $(document).ready (function () {
                     }                       
                 }
 
-                // intervallo tra una nota e l'altra
+                // intervallo tra una nota e l'altra; controllo se l'indice è minore della dimensione del vettore -1,
+                // questo perchè vado a controllare anche la posizione i+1 esima
                 if(i < sheet.notes.length-1){          
                     var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
                     // durata effettiva della nota
@@ -1532,7 +1533,7 @@ $(document).ready (function () {
                     i++;
                 }
                 else{
-                    
+                    // qualcosa, o da togliere
                 }
                     
                 console.log(i);
