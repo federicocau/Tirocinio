@@ -1466,7 +1466,6 @@ $(document).ready (function () {
     var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
     var count; // variabile per il setTime
     var i = 0; // indice del vettore
-    var flag = false; // se suono prima o dopo rispetto all'esecuzione corretta dello spartito
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
             
