@@ -5,147 +5,13 @@ var json = JSON.parse(spartito);
 return json;
 }
 */
-/*
-function spartitoTamburo(){
-    var xmlhttp=new XMLHttpRequest();
-    xmlhttp.open("GET","Tonejs/testTone.json", true);
-    var js;
-    xmlhttp.onload = function () {
-        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-            handleResponse(xmlhttp.responseText);
-        }
-    };
-    // trasformo da json a js
-    //console.log(xmlhttp.responseText);
-    //var js = JSON.parse(xmlhttp.responseText);
-    // prendo solo le note dall'oggetto
-
-    xmlhttp.send(null);
-
-    function handleResponse(response) {
-        js = JSON.parse(response);
-        console.log(js);
-        return js;
-    }
-
-}*/
-
-/*
-function foo(callback) {
-    httpRequest = c
-    httpRequest.onreadystatechange = function () {
-        if (httpRequest.readyState === 4) { // request is done
-            if (httpRequest.status === 200) { // successfully
-                callback(httpRequest.responseText); // we're calling our method
-            }
-        }
-    };
-    httpRequest.open('GET', "Tonejs/testTone.json");
-    httpRequest.send();
-}*/
-/*
-function spartitoTamburo(){
-    
-    var js;
-    foo(function (result) {
-        js = JSON.parse(result);
-        console.log(js);
-        return js;
-    });
-    var msg = $.ajax({type: "GET", url: "Tonejs/testTone.json", async: false}).responseText;
-    console.log(msg);
-    return msg;
-}*/
-/*
-function doRequest(url, callback) {
-    var xmlhttp = new XMLHttpRequest(); // create a new request here
-
-    xmlhttp.open("GET", url, true); // for async
-    xmlhttp.onreadystatechange=function() {     
-        if (xmlhttp.readyState === 4) {
-            if (xmlhttp.status === 200) {
-
-                // pass the response to the callback function
-                callback(null, xmlhttp.responseText);
-
-            } else {
-                // pass the error to the callback function
-                callback(xmlhttp.statusText);
-            }
-        }
-    };
-    xmlhttp.send(null);
-}
-
-
-function t(){
-    
-    var r = 
-            doRequest('Tonejs/testTone.json', function (err, response) { // pass an anonymous function
-                if (err) {
-                    return "error";
-
-                } else {
-                    //console.log(response);
-                    return response;
-                }
-            });
-    console.log(r);
-}
-t();
-*/
-/*
-var a;
-var myVariable = $.ajax({
-    url: 'Tonejs/testTone.json',
-    dataType: 'json',
-    beforeSend: function (xhrObj) {
-        xhrObj.setRequestHeader("Accept", "application/json");
-    },
-    async: true,
-    success: function (data) {
-        console.log(data.respon);
-    }
-    complete: function(r){
-       //alert(r.responseText);
-       return r.responseText;
-    }
-});
-
-console.log(myVariable);*/
-
-/*
-var js;
-
-var a = $.ajax({
-    url : 'Tonejs/testTone.json',
-    method: 'GET',
-    success: function ( result, request ) {
-        js = JSON.parse(result);
-        stampa(js);
-    },
-    failure: function ( result, request) { }
-    });
-    
-//console.log(a);
-function stampa(parsed){
-    console.log(parsed);
-    js = parsed;
-    console.log(js);
-    return js;
-}
-
-js = stampa();
-
-console.log(js);
-*/
-
 
 // funziona ma 'false' è deprecato!!!!
 function spartitoTamburo(){
 
     xmlhttp=new XMLHttpRequest();
-    xmlhttp.open("GET","Tonejs/testTone.json",false);
+    //xmlhttp.open("GET","Tonejs/testTone.json",false);
+    xmlhttp.open("GET","Tonejs/test2strumentiv1.json",false);
     xmlhttp.send();
     // trasformo da json a js
     var js = JSON.parse(xmlhttp.responseText);
@@ -156,29 +22,3 @@ function spartitoTamburo(){
     
     return notes;
 }
-
-
-/*
-function readBody(xhr) {
-    var data;
-    if (!xhr.responseType || xhr.responseType === "text") {
-        data = xhr.responseText;
-    } else if (xhr.responseType === "document") {
-        data = xhr.responseXML;
-    } else {
-        data = xhr.response;
-    }
-    return data;
-}
-
-var xhr = new XMLHttpRequest();
-xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-        console.log(readBody(xhr));
-    }
-    
-    return readBody(xhr);
-};
-xhr.open('GET', 'Tonejs/testTone.json', true);
-xhr.send(null);
-*/

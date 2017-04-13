@@ -9,10 +9,8 @@
 //~ "use strict";
 var msc_VERSION = 40;
 var play = false; // variabile per gestire il controller
-var queue = Queue();
-var delta = 0.15; // delta di approssimazione per la pressione dei tasti
+var delta = 0.7; // delta di approssimazione per la pressione dei tasti; best: 0.7
 
-var i = 0;
 
 
 var opt, onYouTubeIframeAPIReady, msc_credits, media_height, times_arr, offset_js, endtime_js, abc_arr, lpRec;
@@ -137,11 +135,11 @@ Wijzer.prototype.setx = function (x, xleft, xright) { // horizontal position in 
         */
         x = x / scale;                     // g-coors -> pixels for scroll test;
         x = x.toFixed(2); // altrimenti toFixed() non funge
-            var wij = this; // prendo il widget
+            /*var wij = this; // prendo il widget
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                       
-            };
+            };*/
 
         //console.log(" wijx: " + x + " line: " + this.line);
         if (x > xmx || x < nleft + this.hmargin) {
@@ -1464,55 +1462,109 @@ $(document).ready (function () {
     });
     $('body').on ('dragenter dragleave', function () { $(this).toggleClass ('indrag'); });
     
-        var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
+    var queue = Queue(); // creo la coda
+    var queueK = Queue(); // creo la coda
+    // coda doppia
+    //var coda = { snare: Queue(), kick: Queue()};
+    var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
+    var count; // variabile per il setTime
+    var i = 0, k = 0; // contatori delle due tracce
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
-            /*
+            
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
                 switch (key) {
                     case 67:
-                    case 86: // c,v
-                        var data = [key, elmed.currentTime];
-                        queue.push(data);
-                        console.log("keyTime: "+ data[1] + " " + sheet.notes[i].name);
+                    case 86: // snare = c,v (prova tamburo con due dita)
+                        var item = {name: "E2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
+                        // se la coda non è vuota faccio pull and push
+                        if(!queue.isEmpty()){
+                            queue.delete();
+                            console.log('%c wrong ', 'color: red');
+                            queue.insert(item);
+                        }
+                        // altrimenti se è vuota faccio push
+                        else
+                            queue.insert(item);
+                        break;
+                    
+                    case 70:
+                    case 71 :// kick = f,g (prova cassa due dita)
+                        var item = {name: "C2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
+                        // se la coda non è vuota faccio pull and push
+                        if(!queueK.isEmpty()){
+                            queueK.delete();
+                            console.log('%c wrong ', 'color: red');
+                            queueK.insert(item);
+                        }
+                        // altrimenti se è vuota faccio push
+                        else
+                            queueK.insert(item);
                         break;
                 }
-            };*/
-            //controller(); // il controller parte quando premo play (per ora)
+            };
             
-            
-            controller();
-            function controller() {
-                //if(queue){
-                console.log("note: " + sheet.notes[i].name + " time: " + sheet.notes[i].time);   
-                if(!queue.isEmpty()){
-                    // genero un item per test
-                    var item = {name: 'asd', time: 0.2147124};
+          
+            // il controller prende il contatore dello strumento e la coda con cui interagire
+            controller(i, queue);
+            controller(k, queueK);
+            function controller(i, queue) {
+                // approssimo t a 3 cifre decimali                
+                rightTime = sheet.notes[i].time;
+                rightTime = rightTime.toFixed(3);
+                if(!queue.isEmpty()){ 
+                    // estraggo l'item dalla coda
+                    var item = queue.shift();                   
+                    // lo elimino dalla coda
+                    queue.delete();                
+                    var deltaSx = rightTime-delta;
+                    var deltaDx = rightTime+delta;
+                    console.log(item.time+">="+(deltaSx)+"; "+item.time+"<="+(deltaDx) );
                     
-                    // lo inserisco nella coda
-                    queue.insert(item);
+                    // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
+                    console.log(item.name+" "+sheet.notes[i].name);
+                    if ((item.time >= deltaSx) && (item.time <= deltaDx))
+                        console.log('%c right ', 'color: green'); 
+                    else{
+                        console.log('%c wrong ', 'color: red');
+                        //queue.delete();
+                    }                       
+                }
+                
+               
+
+                // intervallo tra una nota e l'altra; controllo se l'indice è minore della dimensione del vettore -1,
+                // questo perchè vado a controllare anche la posizione i+1 esima
+                if(i < sheet.notes.length-1){    
                     
-                    // lo estraggo dalla coda
-                    var item = queue.shift();
-                    
-                    console.log("item: " + item.name + " " + item.time); // non riesce ad accedere all'item
-                    if ((item[1] >= sheet[i].time - delta) && (item[1] <= sheet[i].time + delta))
-                        console.log("right");
+                    var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
+                    // durata effettiva della nota
+                    var duration = sheet.notes[i].duration;
+                    // se l'intervallo tra una nota e l'altra è uguale alla durata della nota
+                    if ( (interval >= duration - 0.1) && (interval <= duration + 0.1) )
+                        sleep = duration;
+                    else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
+                        sleep = sheet.notes[i + 1].time - sheet.notes[i].time; 
+                    // incremento l'indice del vettore delle note 
                     i++;
                 }
-                //console.log("rightTime " + sheet.notes[i-1].duration); // intervallo per il risveglio del controller
-                var sleep = sheet.notes[i - 1].duration; // moltiplico per 1000 per renderlo in secondi
-                // }
-                setTimeout(controller, sleep * 1000); // aspetto una durata pari alla nota corrente - un delta
+                else{
+                    // qualcosa, o da togliere
+                }
+                    
+                console.log(i);
+                //count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
+                count = setTimeout(function() { controller(i,queue); }, sleep * 1000);
             }
         });
-        /*
+        
         document.getElementById('aud').addEventListener('pause', function () {
-            console.log("pause");
-            play = false; // non funziona
-            controller(play); // il controller parte quando premo play (per ora)
-        });*/
+            clearTimeout(count); // fermo le chiamate al controller
+            clearTimeout(count); // fermo le chiamate al controller
+            console.log("Sheet end!");
+            i=0; // azzero il contatore per il vettore delle note
+        });
 });
 })();
 
