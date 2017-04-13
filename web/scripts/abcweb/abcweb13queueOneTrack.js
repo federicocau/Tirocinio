@@ -1524,7 +1524,7 @@ $(document).ready (function () {
                     
                     // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
                     if ((item.time >= deltaSx) && (item.time <= deltaDx))
-                        if(item.name === sheet.notes[i].name)
+                        //if(item.name === sheet.notes[i].name)
                         console.log('%c right ', 'color: green'); 
                     else{
                         console.log('%c wrong ', 'color: red');
