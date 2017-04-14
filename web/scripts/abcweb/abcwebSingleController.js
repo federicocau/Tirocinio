@@ -1477,11 +1477,11 @@ $(document).ready (function () {
                 switch (key) {
                     case 67:
                     case 86: // snare = c,v (prova tamburo con due dita)
-                        var item = {name: "E2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
+                        var item = {name: "D2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
                         // se la coda non è vuota faccio pull and push
                         if(!queueS.isEmpty()){
                             queueS.delete();
-                            console.log('%c wrong ', 'color: red');
+                            //console.log('%c wrong ', 'color: red');
                             queueS.insert(item);
                         }
                         // altrimenti se è vuota faccio push
@@ -1491,11 +1491,11 @@ $(document).ready (function () {
                     
                     case 70:
                     case 71 :// kick = f,g (prova cassa due dita)
-                        var item = {name: "C2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
+                        var item = {name: "B1", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
                         // se la coda non è vuota faccio pull and push
                         if(!queueK.isEmpty()){
                             queueK.delete();
-                            console.log('%c wrong ', 'color: red');
+                            //console.log('%c wrong ', 'color: red');
                             queueK.insert(item);
                         }
                         // altrimenti se è vuota faccio push
@@ -1523,7 +1523,7 @@ $(document).ready (function () {
                     if( (sheet.notes[i].time === sheet.notes[i+1].time) && (sheet.notes[i].name !== sheet.notes[i+1].name) ){
                         // allungo lo sleep sino alla prossima nota
                         sleep = sheet.notes[i].duration;
-                        //console.log("entrambe");
+                        console.log("entrambe");
                         // incremento di due perchè ho due note in contemporanea
                         if ( i+2 < sheet.notes.length-1)
                             i+=2; 
@@ -1544,16 +1544,19 @@ $(document).ready (function () {
                                 (itemK.time >= deltaSx) && (itemK.time <= deltaDx))
                                 console.log('%c right ', 'color: green');
                             else{
-                                console.log('%c wrong ', 'color: red');     
+                                console.log('%c wrong entrambe ', 'color: red');     
                             }
                         }
+                        else
+                                console.log('%c wrong entrambe', 'color: red');
                     }
                     
                     // altrimenti controllo se si tratta o dello snare o del kick
                     else{                       
                         // se è il tamburo
-                        if(sheet.notes[i].name === "E2"){
-                            //console.log("tamburo");
+                        if(sheet.notes[i].name === "D2"){
+                            
+                            console.log("tamburo");
                             if(!queueS.isEmpty()) {
                                 var itemS = queueS.shift();
                                 queueS.delete();
@@ -1561,13 +1564,16 @@ $(document).ready (function () {
                                 if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx))
                                     console.log('%c right ', 'color: green');
                                 else {
-                                    console.log('%c wrong ', 'color: red');
+                                    console.log('%c wrong tamburo', 'color: red');
                                     //queue.delete();
                                 }
                             }
+                            else
+                                console.log('%c wrong tamburo', 'color: red');                  
                         }
-                        else if(sheet.notes[i].name === "C2"){
-                            //console.log("cassa");
+                        // se è la cassa
+                        else if(sheet.notes[i].name === "B1"){                         
+                            console.log("cassa");
                             if(!queueK.isEmpty()){
                                 var itemK = queueK.shift();
                                 queueK.delete();
@@ -1575,10 +1581,12 @@ $(document).ready (function () {
                                 if ((itemK.time >= deltaSx) && (itemK.time <= deltaDx))
                                     console.log('%c right ', 'color: green');
                                 else {
-                                    console.log('%c wrong ', 'color: red');
+                                    console.log('%c wrong cassa', 'color: red');
                                     //queue.delete();
                                 }
                             }
+                            else
+                                console.log('%c wrong cassa', 'color: red');                                     
                         }
                         
                         var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
@@ -1593,51 +1601,7 @@ $(document).ready (function () {
                         // incremento l'indice del vettore delle note 
                         i++; 
                     }
-                    
-  
-                }
-                
-                /*
-                if(!queue.isEmpty()){ 
-                    // estraggo l'item dalla coda
-                    var item = queue.shift();                   
-                    // lo elimino dalla coda
-                    queue.delete();                
-                    var deltaSx = rightTime-delta;
-                    var deltaDx = rightTime+delta;
-                    console.log(item.time+">="+(deltaSx)+"; "+item.time+"<="+(deltaDx) );
-                    
-                    // controllo se il tempo è compreso tra un intervallo dato dal delta (tempo corretto)
-                    //console.log(item.name+" "+sheet.notes[i].name);
-                    if ((item.time >= deltaSx) && (item.time <= deltaDx))
-                        console.log('%c right ', 'color: green'); 
-                    else{
-                        console.log('%c wrong ', 'color: red');
-                        //queue.delete();
-                    }                       
-                }
-                
-               
-
-                // intervallo tra una nota e l'altra; controllo se l'indice è minore della dimensione del vettore -1,
-                // questo perchè vado a controllare anche la posizione i+1 esima
-                if(i < sheet.notes.length-1){    
-                    
-                    var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
-                    // durata effettiva della nota
-                    var duration = sheet.notes[i].duration;
-                    // se l'intervallo tra una nota e l'altra è uguale alla durata della nota
-                    if ( (interval >= duration - 0.1) && (interval <= duration + 0.1) )
-                        sleep = duration;
-                    else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
-                        sleep = sheet.notes[i + 1].time - sheet.notes[i].time; 
-                    // incremento l'indice del vettore delle note 
-                    i++;
-                }
-                else{
-                    // qualcosa, o da togliere
-                }*/
-                    
+                }                    
                 console.log(i);
                 //count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
                 //console.log(sleep);
@@ -1653,4 +1617,3 @@ $(document).ready (function () {
         });
 });
 })();
-

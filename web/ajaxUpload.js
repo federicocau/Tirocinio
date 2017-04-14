@@ -56,9 +56,14 @@ function estrai(){
         var a = document.getElementById("download").appendChild(
                 document.createElement("a")
                 );
-        a.download = "newSheet.json";
+        // prendo il nome del file midi
+        var name = document.getElementById("Text").innerHTML;
+        // estrapolo solo il nome senza l'estensione
+        name = name.substring(0,name.length-4);
+        console.log(name);
+        a.download = name+".json";
         a.href = "data:text/json," + json;
-        a.innerHTML = "Download";
+        a.innerHTML = "Download - "+name+".json";
        
         // trasforma da json a javascript
         /*var js = JSON.parse(json);
