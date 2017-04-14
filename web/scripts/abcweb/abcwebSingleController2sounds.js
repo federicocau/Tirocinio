@@ -1465,19 +1465,11 @@ $(document).ready (function () {
     var queueS = Queue(); // creo la coda
     var queueK = Queue(); // creo la coda
     var queueH = Queue(); //
-    // mappatura suoni - nomi - code
-    var suoni = [
-        { key: "D2", name: "snare", coda: queueS },
-        { key: "B1", name: "kick", coda: queueK },
-        { key: "F#2", name: "hihat", coda: queueH }
-    ];
-    // vettore per inserire le code giuste
-    var code = [];
-    var ix = []; // vettore indici
+    // coda doppia
     //var coda = { snare: Queue(), kick: Queue()};
     var sheet = spartitoTamburo(); // oggetto contenente i dettagli dello spartito
     var count; // variabile per il setTime
-    var i = 0; // contatore traccia
+    var i = 0, k = 0; // contatori delle due tracce
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
             
@@ -1531,10 +1523,8 @@ $(document).ready (function () {
             //var queue = { snare: queueS, kick: queueK};
           
             // il controller prende il contatore dello strumento e la coda con cui interagire
-            //controller(i, queueS, queueK);
-            controller();
-            //function controller(i, queueS, queueK) {
-            function controller() {
+            controller(i, queueS, queueK);
+            function controller(i, queueS, queueK) {
                 // approssimo t a 3 cifre decimali                
                 rightTime = sheet.notes[i].time;
                 rightTime = rightTime.toFixed(3);
@@ -1545,26 +1535,22 @@ $(document).ready (function () {
                 if(i < sheet.notes.length-1){
                     
                 // se la nota iesima e la i+1 hanno stesso tempo e diverso nome
-                if( (sheet.notes[i].time === sheet.notes[i+1].time) && (sheet.notes[i].name !== sheet.notes[i+1].name) ){
+                    if( (sheet.notes[i].time === sheet.notes[i+1].time) && (sheet.notes[i].name !== sheet.notes[i+1].name) ){
                         // allungo lo sleep sino alla prossima nota
                         sleep = sheet.notes[i].duration;
+                        console.log("entrambe");
+                        // incremento di due perchè ho due note in contemporanea
+                        if ( i+2 < sheet.notes.length-1)
+                            i+=2; 
+                        else
+                            i++;
                         
-                        // ricerca delle code da usare in base ai suoni
-                        for(c=0; c<2; c++){
-                            for(l=0; l<suoni.length; l++){
-                                if(sheet.notes[i+c].name === suoni[l].key) // i+c perchè controllo prima la posizione iesima e poi la 1+iesima
-                                    code.push({key: suoni[l].key, name:suoni[l].name, queue: suoni[l].coda}); // da fare: resettare code alla fine di ogni lettura!
-                            }
-                        }                     
-                            
-                        console.log(code[0].name + " + " + code[1].name);                              
                         // se le code sono entrambe diverse da null perchè mi aspetto una contemporaneità dei suoni
-                        if( !(code[0].queue).isEmpty() && !(code[1].queue).isEmpty()){
-                            //console.log(code[0].name+" e "+code[1].name);
-                            var itemS = (code[0].queue).shift();
-                            var itemK = (code[1].queue).shift();
-                            (code[0].queue).delete();
-                            (code[1].queue).delete();
+                        if( !queueS.isEmpty() && !queueK.isEmpty()){
+                            var itemS = queueS.shift();
+                            var itemK = queueK.shift();
+                            queueS.delete();
+                            queueK.delete();
                             console.log(itemS.time+">="+(deltaSx)+"; "+itemS.time+"<="+(deltaDx) );
                             console.log(itemK.time+">="+(deltaSx)+"; "+itemK.time+"<="+(deltaDx) );
                             
@@ -1578,59 +1564,63 @@ $(document).ready (function () {
                         }
                         else
                                 console.log('%c wrong entrambe', 'color: red');
-                            
-                        // incremento di due perchè ho due note in contemporanea
-                        if ( i+2 < sheet.notes.length-1)
-                            i+=2; 
-                        else{
-                            i++;
-                        }
-                             
-                        
-                        code = []; // resetto la coda per ogni nota suonata
                     }
                     
-                    // altrimenti controllo di quale strumento si tratta
-                    else{
-                        var q;
-                        switch(sheet.notes[i].name){
-                            case "D2":
-                                q = {coda: suoni[0].coda};
-                                console.log("snare");
-                                break;
-                            case "B1":
-                                q = {coda: suoni[1].coda};
-                                console.log("kick");
-                                break;
-                            case "F#2":
-                                q = {coda: suoni[2].coda};
-                                console.log("hihat");
-                                break;
-                            default:
-                                console.log("click");
-                                q = false;
-                        }
-                        
-                        //console.log(q.coda.isEmpty() + " " + suoni[0].coda);
-                        if(q){
-                        if (!(q.coda).isEmpty()) {
-                            var itemS = (q.coda).shift();
-                            (q.coda).delete();
-                            console.log(itemS.time + ">=" + (deltaSx) + "; " + itemS.time + "<=" + (deltaDx));
-                            if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx)) {
-                                if (!queueK.isEmpty()) {
-                                    var itemK = queueK.shift();
-                                    queueK.delete();
-                                    if ((itemK.time >= deltaSx) && (itemK.time <= deltaDx))
-                                        console.log('%c wrong ', 'color: red');
-                                } else
-                                    console.log('%c right ', 'color: green');
-                            } else {
-                                console.log('%c wrong', 'color: red');
+                    // altrimenti controllo se si tratta o dello snare o del kick
+                    else{                       
+                        // se è il tamburo
+                        if(sheet.notes[i].name === "D2"){
+                            
+                            console.log("tamburo");
+                            if(!queueS.isEmpty()) {
+                                var itemS = queueS.shift();
+                                queueS.delete();
+                                console.log(itemS.time+">="+(deltaSx)+"; "+itemS.time+"<="+(deltaDx) );
+                                
+                                if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx)){
+                                    if(!queueK.isEmpty()){
+                                        var itemK = queueK.shift();
+                                        queueK.delete();
+                                        if ((itemK.time >= deltaSx) && (itemK.time <= deltaDx))
+                                            console.log('%c wrong tamburo', 'color: red');
+                                   }
+                                    else
+                                           console.log('%c right ', 'color: green');   
+                                }
+                                    
+                                else {
+                                    console.log('%c wrong tamburo', 'color: red');
+                                }
                             }
-                        } else
-                            console.log('%c wrong', 'color: red');
-                    }
+                            else
+                                console.log('%c wrong tamburo', 'color: red');                  
+                        }
+                        // se è la cassa
+                        else if(sheet.notes[i].name === "B1"){                         
+                            console.log("cassa");
+                            if(!queueK.isEmpty()){
+                                var itemK = queueK.shift();
+                                queueK.delete();
+                                console.log(itemK.time+">="+(deltaSx)+"; "+itemK.time+"<="+(deltaDx) );
+                                
+                                if ((itemK.time >= deltaSx) && (itemK.time <= deltaDx)){
+                                    if(!queueS.isEmpty()){
+                                        var itemS = queueS.shift();
+                                        queueS.delete();
+                                        if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx))
+                                            console.log('%c wrong cassa', 'color: red');
+                                   }
+                                    else
+                                           console.log('%c right ', 'color: green');   
+                                }
+                                    
+                                else {
+                                    console.log('%c wrong cassa', 'color: red');
+                                }
+                            }
+                            else
+                                console.log('%c wrong cassa', 'color: red');                                     
+                        }
                         
                         var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
                         // durata effettiva della nota
@@ -1639,15 +1629,16 @@ $(document).ready (function () {
                         if ((interval >= duration - 0.1) && (interval <= duration + 0.1))
                             sleep = duration;
                         else // altrimenti vuol dire che c'è una pausa, e aspetterò l'intervallo di tempo e non la durata della nota
-                            sleep = sheet.notes[i + 1].time - sheet.notes[i].time;                       
+                            sleep = sheet.notes[i + 1].time - sheet.notes[i].time;
+                        
                         // incremento l'indice del vettore delle note 
                         i++; 
                     }
                 }                    
                 console.log(i);
-                count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
+                //count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
                 //console.log(sleep);
-                //count = setTimeout(function() { controller(i,queueS,queueK); }, sleep * 1000);
+                count = setTimeout(function() { controller(i,queueS,queueK); }, sleep * 1000);
             }
         });
         
