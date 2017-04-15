@@ -1595,15 +1595,15 @@ $(document).ready (function () {
                         var q;
                         switch(sheet.notes[i].name){
                             case "D2":
-                                q = {coda: suoni[0].coda};
+                                q = {key: suoni[0].key, coda: suoni[0].coda};
                                 console.log("snare");
                                 break;
                             case "B1":
-                                q = {coda: suoni[1].coda};
+                                q = {key: suoni[1].key, coda: suoni[1].coda};
                                 console.log("kick");
                                 break;
                             case "F#2":
-                                q = {coda: suoni[2].coda};
+                                q = {key: suoni[2].key, coda: suoni[2].coda};
                                 console.log("hihat");
                                 break;
                             default:
@@ -1613,24 +1613,50 @@ $(document).ready (function () {
                         
                         //console.log(q.coda.isEmpty() + " " + suoni[0].coda);
                         if(q){
-                        if (!(q.coda).isEmpty()) {
-                            var itemS = (q.coda).shift();
-                            (q.coda).delete();
-                            console.log(itemS.time + ">=" + (deltaSx) + "; " + itemS.time + "<=" + (deltaDx));
-                            if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx)) {
-                                if (!queueK.isEmpty()) {
-                                    var itemK = queueK.shift();
-                                    queueK.delete();
-                                    if ((itemK.time >= deltaSx) && (itemK.time <= deltaDx))
+                            // se la coda del suono esatto non + vuota
+                            if (!(q.coda).isEmpty()) {
+                                // estrapolo l'item
+                                var itemS = (q.coda).shift();
+                                // lo rimuovo dalla coda
+                                (q.coda).delete();
+                                console.log(itemS.time + ">=" + (deltaSx) + "; " + itemS.time + "<=" + (deltaDx));
+                                // verifico se la sua tempistica è corretta
+                                if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx)) {
+                                    // 'conta' mi serve per sapere se altri strumenti diverso da quello corretto 
+                                    // vengono suonati nella tempistica correttta
+                                    var conta = 0;
+                                    // scorro il vettore dei suoni
+                                    for (k = 0; k < suoni.length; k++) {
+                                        // controllo che il suono sia diverso da quello corretto
+                                        if (suoni[k].key !== q.key)
+                                            // controllo che la sua coda non sia vuota
+                                            if (!suoni[k].coda.isEmpty()) {
+                                                var item = suoni[k].coda.shift();
+                                                suoni[k].coda.delete();
+                                                // se lo strumento errato ha una tempistica giusta vuol dire che
+                                                // sono stati suonati quasi insieme, il che musicalmente è errato!!!
+                                                if ((item.time >= deltaSx) && (item.time <= deltaDx))
+                                                    // quindi 'conta' considera quanti altri strumenti sono stati suonati
+                                                    // oltre quello corretto
+                                                    conta++;
+                                            }
+                                    }
+                                    // se nessun altro strumento è stato suonato oltre quello corretto
+                                    if (conta === 0)
+                                        console.log('%c right ', 'color: green');
+                                    // altrimenti esecuzione errata
+                                    else
                                         console.log('%c wrong ', 'color: red');
-                                } else
-                                    console.log('%c right ', 'color: green');
-                            } else {
+                                }
+                                // se lo strumento è stato suonato nella tempistica errata -> esecuzione errata
+                                else
+                                    console.log('%c wrong ', 'color: red');
+
+                            } 
+                            // se la coda dello strumento corretto è vuota (non è stato suonato) -> esecuzione errata
+                            else
                                 console.log('%c wrong', 'color: red');
-                            }
-                        } else
-                            console.log('%c wrong', 'color: red');
-                    }
+                        }
                         
                         var interval = (sheet.notes[i + 1].time - sheet.notes[i].time);
                         // durata effettiva della nota
