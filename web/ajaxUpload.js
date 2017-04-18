@@ -46,12 +46,14 @@ function estrai(){
 
 
 // estrae il json  (devo ancora salvare il file in json)
+// risolvere il problema che ne crea sempre di nuovi ()child!!!
 function estrai(){
     t = setTimeout(getJSON, 1000); 
     function getJSON(){
         var json = document.getElementById('ResultsText').value;
-        console.log(json);
+        //console.log(json);
         clearTimeout(t);
+        
         // scarica il file json
         var a = document.getElementById("download").appendChild(
                 document.createElement("a")
@@ -64,6 +66,7 @@ function estrai(){
         a.download = name+".json";
         a.href = "data:text/json," + json;
         a.innerHTML = "Download - "+name+".json";
+
        
         // trasforma da json a javascript
         /*var js = JSON.parse(json);
