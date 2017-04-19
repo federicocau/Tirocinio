@@ -1476,7 +1476,7 @@ $(document).ready (function () {
         { key: "F#2", name: "hihat", coda: queueH },
         { key: "C3", name: "hitom", coda: queueTom1 },
         { key: "A2", name: "floortom", coda: queueTom3 },
-        { key: "C#3", name: "hitom", coda: queueCrash }
+        { key: "C#3", name: "crash", coda: queueCrash }
     ];
     // vettore per inserire le code giuste nel caso di contemporaneità degli strumenti
     var code = [];
@@ -1595,7 +1595,7 @@ $(document).ready (function () {
                             }
 
                         /*for(u=0;u<code.length; u++)     
-                            console.log("Coda giusta: " + code[u].name);
+                            console.log("Coda giusta " + code[u].name);
                         for(u=0;u<codeErr.length; u++)     
                             console.log("Coda errata: " + codeErr[u].name);*/
 
@@ -1650,11 +1650,11 @@ $(document).ready (function () {
                             
                             // rimuovo l'elemento dell'ultima coda (non lo faccio nel for )
                             (code[nStrumenti-1].queue).delete();
-                            // se le code errate erano vuote o il loro tempo era errato
+                            // se le code errate erano vuote o il loro tempo era errato -> ho suonato solo gli strumenti giusti
                             if (corretto)
                                 console.log('%c right ', 'color: green');
                             else
-                                console.log('%c wrong ', 'color: red');
+                                console.log('%c altri strumenti errati suonati ', 'color: red');
                         }
                         // se sono ancora nel range sleep prende la differenza tra i suoni correnti e il suono successivo
                         if(i+nStrumenti < sheet.notes.length-1)

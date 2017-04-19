@@ -11,7 +11,7 @@ function spartitoTamburo(){
 
     xmlhttp=new XMLHttpRequest();
     //xmlhttp.open("GET","Tonejs/testTone.json",false);
-    xmlhttp.open("GET","Tonejs/02_sheet6Sounds.json",false);
+    xmlhttp.open("GET","Tonejs/03_sheetDoubleKickFill.json",false);
     xmlhttp.send();
     // trasformo da json a js
     var js = JSON.parse(xmlhttp.responseText);
