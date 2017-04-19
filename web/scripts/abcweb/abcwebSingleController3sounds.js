@@ -1469,14 +1469,14 @@ $(document).ready (function () {
     var queueTom1 = Queue();
     var queueTom3 = Queue();
     var queueCrash = Queue();
-    // mappatura suoni - nomi - code
+    // mappatura suoni - nomi - code - tasti
     var suoni = [
-        { key: "D2", name: "snare", coda: queueS },
-        { key: "B1", name: "kick", coda: queueK },
-        { key: "F#2", name: "hihat", coda: queueH },
-        { key: "C3", name: "hitom", coda: queueTom1 },
-        { key: "A2", name: "floortom", coda: queueTom3 },
-        { key: "C#3", name: "crash", coda: queueCrash }
+        { key: "D2", name: "snare", coda: queueS, button: [67, 86]},
+        { key: "B1", name: "kick", coda: queueK, button: [70, 71]},
+        { key: "F#2", name: "hihat", coda: queueH, button: [65]},
+        { key: "C3", name: "hitom", coda: queueTom1, button: [83] },
+        { key: "A2", name: "floortom", coda: queueTom3, button: [88] },
+        { key: "C#3", name: "crash", coda: queueCrash, button: [90] }
     ];
     // vettore per inserire le code giuste nel caso di contemporaneità degli strumenti
     var code = [];
@@ -1501,39 +1501,21 @@ $(document).ready (function () {
             
             document.onkeydown = function (e) {
                 var key = e.keyCode ? e.keyCode : e.which;
-                switch (key) {
-                    case 67:
-                    case 86: // snare = c,v (prova tamburo con due dita)
-                        var item = {name: "D2", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
-                        pushCoda(0,item);
-                        break;
-                    
-                    case 70:
-                    case 71 :// kick = f,g (prova cassa due dita)
-                        var item = {name: "B1", time: elmed.currentTime.toFixed(3)}; // approssimo il tempo corrente a 3 cifre decimali
-                        pushCoda(1,item);
-                        break;
-                    
-                    case 65: // hi hat = a
-                        var item = {name: "F#2", time: elmed.currentTime.toFixed(3)};
-                        pushCoda(2,item);        
-                        break;
-                        
-                    case 83: // htitom = s
-                        var item = {name: "C3", time: elmed.currentTime.toFixed(3)};
-                        pushCoda(3,item);
-                        break;
-                        
-                    case 88: // floortom = x
-                        var item = {name: "A2", time: elmed.currentTime.toFixed(3)};
-                        pushCoda(4,item);
-                        break;
-                        
-                    case 90: // crash = z
-                        var item = {name: "C#3", time: elmed.currentTime.toFixed(3)};
-                        pushCoda(5,item);
-                        break;
-                        
+                
+                // scorro il vettore dei suoni
+                setButton:
+                for (k = 0; k < suoni.length; k++) {
+                    // scorro il vettore dei tasti 
+                    for (j = 0; j < suoni[k].button.length; j++) {
+                        // se la key premuta è uguale ad uno dei valori trovati nel vettore (che corrisponde ai codici)
+                        if (key === suoni[k].button[j]) {
+                            // creo l'item 
+                            var item = {name: suoni[k].key, time: elmed.currentTime.toFixed(3)};
+                            // lo pusho nella coda
+                            pushCoda(k, item);
+                            break setButton; // se lo trovo esco dal ciclo for più esterno
+                        }
+                    }
                 }
             };
                      
@@ -1544,30 +1526,24 @@ $(document).ready (function () {
                
                 // se posso ancora leggere la nota i+1esima
                 if(i < sheet.notes.length-1){
-                // approssimo t a 3 cifre decimali                
                 rightTime = sheet.notes[i].time;
-                rightTime = rightTime.toFixed(3);
                 var deltaSx = rightTime - delta;
-                var deltaDx = rightTime + delta; 
+                var deltaDx = rightTime + delta;     
                 
                 // strumenti diversi suonati nello allo stesso tempo
                 var nStrumenti = 1;
                 // se trovo che due suoni vengono suonati allo stesso tempo ma hanno nomi diversi
                 while ((sheet.notes[i].time === sheet.notes[i + nStrumenti].time)
-                        && (sheet.notes[i].name !== sheet.notes[i + nStrumenti].name)) {
+                   && (sheet.notes[i].name !== sheet.notes[i + nStrumenti].name)){
                     // se è cosi' aumento gli strumenti suonati in contemporanea a 2
                     nStrumenti++;
-                    if (i + nStrumenti >= sheet.notes.length - 1) // controllo se non sforo il vettore
+                    if (i + nStrumenti >= sheet.notes.length - 1) // controllo se non sto sforando il vettore
                         break;
                 }
                 
                 console.log("Strumenti suonati: " + nStrumenti);
-                    // se suono più uno strumento in contemporanea
-                    if(nStrumenti > 1) {
-
-                        // allungo lo sleep sino alla prossima nota: 
-                        //sleep = sheet.notes[i].duration;                                            
-                        
+                    // se suono più di uno strumento in contemporanea
+                    if(nStrumenti > 1) {                     
                         // creo la coda degli strumenti corretti
                         for (c = 0; c < nStrumenti; c++) {
                             for (l = 0; l < suoni.length; l++) {
@@ -1602,7 +1578,7 @@ $(document).ready (function () {
 
                         // variabile per immagazzinare le coppie di code non vuote
                         var info = 0;
-                        // controllo a coppie e quindi avro' lunghezza vettore - 1
+                        // controllo a coppie e quindi avro': (num. strumenti) - 1
                         for (n = 0; n < nStrumenti - 1; n++)
                             // se la coppia di code non è vuota
                             if (!(code[n].queue).isEmpty() && !(code[n + 1].queue).isEmpty())
@@ -1624,9 +1600,10 @@ $(document).ready (function () {
                                 console.log(itemS.time + ">=" + (deltaSx) + "; " + itemS.time + "<=" + (deltaDx));
                                 console.log(itemK.time + ">=" + (deltaSx) + "; " + itemK.time + "<=" + (deltaDx));
                                 // se i tasti cliccati sono a tempo rispetto allo spartito -> for per più suoni
+                                checksound:
                                 if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx) &&
                                         (itemK.time >= deltaSx) && (itemK.time <= deltaDx)) {
-
+                                    // controllo il contenuto delle code errate    
                                     for (s = 0; s < codeErr.length; s++) {
                                         // se la coda del suono errato non è vuota -> ci andrà un for per più suoni
                                         if (!(codeErr[s].queue).isEmpty()) {
@@ -1638,6 +1615,7 @@ $(document).ready (function () {
                                             if ((item.time >= deltaSx) && (item.time <= deltaDx)) {
                                                 //console.log('%c wrong ', 'color: red');
                                                 corretto = false;
+                                                break checksound; // se anche uno è scorretto esco dal ciclo
                                             }
                                         }
                                     }
@@ -1671,15 +1649,18 @@ $(document).ready (function () {
 
                     // altrimenti controllo di quale strumento si tratta (controllo nell'obj dei suoni)
                     else {
-                        var q;                      
+                        var q; 
+                        searchInstrument:
                         for(s=0; s<suoni.length; s++){
                             if(sheet.notes[i].name === suoni[s].key){
                                 q = {key: suoni[s].key, name: suoni[s].name, coda: suoni[s].coda};
-                                break;
+                                break searchInstrument; // se lo trovo esco
                             }
-                        }                        
+                        }
+                        // se lo strumento non è stato trovato nella lista allora è il click
                         if(!q)
                             console.log("click");
+                        // altrimenti lo stampo
                         else
                             console.log(q.name);
 
@@ -1697,25 +1678,29 @@ $(document).ready (function () {
                                 if ((itemS.time >= deltaSx) && (itemS.time <= deltaDx)) {
                                     // 'conta' mi serve per sapere se altri strumenti diverso da quello corretto 
                                     // vengono suonati nella tempistica correttta
-                                    var conta = 0;
+                                    var conta = true;
                                     // scorro il vettore dei suoni
+                                    checkErrors:
                                     for (k = 0; k < suoni.length; k++) {
                                         // controllo che il suono sia diverso da quello corretto
-                                        if (suoni[k].key !== q.key)
+                                        if (suoni[k].key !== q.key){
                                             // controllo che la sua coda non sia vuota
                                             if (!suoni[k].coda.isEmpty()) {
                                                 var item = suoni[k].coda.shift();
                                                 suoni[k].coda.delete();
                                                 // se lo strumento errato ha una tempistica giusta vuol dire che
                                                 // sono stati suonati quasi insieme, il che musicalmente è errato!!!
-                                                if ((item.time >= deltaSx) && (item.time <= deltaDx))
+                                                if ((item.time >= deltaSx) && (item.time <= deltaDx)){
                                                     // quindi 'conta' considera quanti altri strumenti sono stati suonati
                                                     // oltre quello corretto
-                                                    conta++;
+                                                    conta = false;
+                                                    break checkErrors; // se è stato suonato almeno uno strumento errato esco dal ciclo 
+                                                }
                                             }
+                                        }
                                     }
                                     // se nessun altro strumento è stato suonato oltre quello corretto
-                                    if (conta === 0)
+                                    if (conta)
                                         console.log('%c right ', 'color: green');
                                     // altrimenti esecuzione errata
                                     else
@@ -1744,7 +1729,7 @@ $(document).ready (function () {
                     }
                 }
                 console.log(i);
-                
+                // se sforo il vettore metto uno sleep a caso -> da rivedere
                 if(i >= sheet.notes.length - 1)
                     sleep = 20;
                 count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
