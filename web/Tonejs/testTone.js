@@ -6,12 +6,28 @@ return json;
 }
 */
 
+/*
 // funziona ma 'false' è deprecato!!!!
 function spartitoTamburo(){
-
     xmlhttp=new XMLHttpRequest();
     //xmlhttp.open("GET","Tonejs/testTone.json",false);
-    xmlhttp.open("GET","Tonejs/05_sheetTestSyncope.json",false);
+    xmlhttp.open("GET","Tonejs/01_sheetWithPause.json",false);
+    xmlhttp.send();
+    // trasformo da json a js
+    var js = JSON.parse(xmlhttp.responseText);
+    // prendo solo le note dall'oggetto
+    //var notes = js.tracks[0].notes;
+    var notes = js.tracks[0];
+    // prova stampa
+    
+    return notes;
+}*/
+
+// funziona ma 'false' è deprecato!!!!
+function spartito(filename){
+    xmlhttp=new XMLHttpRequest();
+    //xmlhttp.open("GET","Tonejs/testTone.json",false);
+    xmlhttp.open("GET","Tonejs/" + filename,false);
     xmlhttp.send();
     // trasformo da json a js
     var js = JSON.parse(xmlhttp.responseText);
