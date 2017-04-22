@@ -51,23 +51,34 @@ function estrai(){
     t = setTimeout(getJSON, 1000); 
     function getJSON(){
         var json = document.getElementById('ResultsText').value;
-        //console.log(json);
         clearTimeout(t);
         
-        // scarica il file json
-        var a = document.getElementById("download").appendChild(
+        function modificaLink(a){
+            var name = document.getElementById("Text").innerHTML;
+            // estrapolo solo il nome senza l'estensione
+            name = name.substring(0, name.length - 4);
+            console.log(name);
+            a.download = name + ".json";
+            a.href = "data:text/json," + json;
+            a.innerHTML = "Download - " + name + ".json";  
+        }
+        
+        var d = document.getElementById("download").textContent;
+        // controllo se il contenuto del div è vuoto, e se lo è creo il child a
+        if(d === ""){
+            console.log("a creato");
+            var a = document.getElementById("download").appendChild(
                 document.createElement("a")
                 );
-        // prendo il nome del file midi
-        var name = document.getElementById("Text").innerHTML;
-        // estrapolo solo il nome senza l'estensione
-        name = name.substring(0,name.length-4);
-        console.log(name);
-        a.download = name+".json";
-        a.href = "data:text/json," + json;
-        a.innerHTML = "Download - "+name+".json";
-
-       
+            modificaLink(a);
+        }
+        // altrimenti a esiste già e sovrascrivo il suo contenuto
+        else{
+            console.log("a sovrascritto");
+            var a = document.getElementById("download").getElementsByTagName("a")[0];
+            modificaLink(a);
+        }
+        
         // trasforma da json a javascript
         /*var js = JSON.parse(json);
         console.log(js);
