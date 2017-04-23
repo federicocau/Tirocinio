@@ -1487,15 +1487,20 @@ $(document).ready (function () {
     var sheet;
     // quando cambia il nome del file dello spartito
     document.getElementById("fknp").addEventListener("change", function() {
+        // aspetto 0.5 secondi 
         var t = setTimeout(getFileName, 500);
         function getFileName(){
             var path = document.getElementById("fknp").value;
             console.log(path);
+            // prendo solo il nome del file 
             var leafname = path.split('\\').pop().split('/').pop();
             console.log(leafname);
+            // gli tolgo l'estensione (da rivedere)
             var filename = leafname.substring(0, leafname.length - 4);
+            // lo rinomino in json
             filename = filename + ".json";
             console.log(filename);
+            // estrapolo il json
             sheet = spartito(filename);
         }
     });
@@ -1562,7 +1567,7 @@ $(document).ready (function () {
                         for (c = 0; c < nStrumenti; c++) {
                             for (l = 0; l < suoni.length; l++) {
                                 if (sheet.notes[i + c].name === suoni[l].key) // i+c perchè controllo prima la posizione iesima e poi la c+1+iesima
-                                    code.push({key: suoni[l].key, name: suoni[l].name, queue: suoni[l].coda}); // poi resetto la coda
+                                    code.push({key: suoni[l].key, name: suoni[l].name, queue: suoni[l].coda});
                             }
                         }
 
@@ -1692,9 +1697,9 @@ $(document).ready (function () {
                                     var conta = true;
                                     // scorro il vettore dei suoni
                                     checkErrors:
-                                            for (k = 0; k < suoni.length; k++) {
-                                                // controllo che il suono sia diverso da quello corretto
-                                                if (suoni[k].key !== q.key) {
+                                        for (k = 0; k < suoni.length; k++) {
+                                            // controllo che il suono sia diverso da quello corretto
+                                            if (suoni[k].key !== q.key) {
                                                 // controllo che la sua coda non sia vuota
                                                 if (!suoni[k].coda.isEmpty()) {
                                                     var item = suoni[k].coda.shift();
