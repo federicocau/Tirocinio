@@ -1506,7 +1506,9 @@ $(document).ready (function () {
     });
     
     var count; // variabile per il setTime
-    var i = 0; // contatore indice vettore traccia
+    var i = 0; // contatore indice vettore tracciaz
+    var newSleep = 0; // somma dei vari sleep
+    var rightTime = 0; // tempo esatto in cui suonare
         document.getElementById('aud').addEventListener('play', function () {
             //console.log("play");
             
@@ -1522,7 +1524,11 @@ $(document).ready (function () {
             
             document.onkeydown = function (e) {
                 // catturo il codice del tasto premuto
-                var key = e.keyCode ? e.keyCode : e.which;                
+                var key = e.keyCode ? e.keyCode : e.which; 
+                // se l'utente suona quando il controller non è attivo -> esecuzione errata
+                if(elmed.currentTime > (rightTime + delta) && elmed.currentTime < (newSleep - delta))
+                    console.log('%c controller in sleep', 'color: red');
+                
                 // scorro il vettore dei suoni
                 setButton:
                 for (k = 0; k < suoni.length; k++) {
@@ -1749,6 +1755,8 @@ $(document).ready (function () {
                 // se sforo il vettore metto uno sleep a caso -> da rivedere
                 if (i >= sheet.notes.length - 1)
                     sleep = 20;
+                // sommo allo sleep totale quello corrente
+                newSleep += sleep;
                 count = setTimeout(controller, sleep * 1000); // moltiplico per 1000 per renderlo in secondi
                 //console.log(sleep);
                 //count = setTimeout(function() { controller(i,queueS,queueK); }, sleep * 1000);
@@ -1759,7 +1767,12 @@ $(document).ready (function () {
             clearTimeout(count); // fermo le chiamate al controller
             clearTimeout(count); // fermo le chiamate al controller
             console.log("Sheet end!");
-            i=0; // azzero il contatore per il vettore delle note
+            if(i >= sheet.notes.length -1){
+                newSleep = 0;
+                oldSleep = 0;
+                rightTime = 0;
+                i=0; // azzero il contatore per il vettore delle note
+            }
         });
 });
 })();

@@ -46,7 +46,6 @@ function estrai(){
 
 
 // estrae il json  (devo ancora salvare il file in json)
-// risolvere il problema che ne crea sempre di nuovi ()child!!!
 function estrai(){
     t = setTimeout(getJSON, 1000); 
     function getJSON(){
